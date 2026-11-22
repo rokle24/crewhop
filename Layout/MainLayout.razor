@@ -1,0 +1,80 @@
+﻿@inherits LayoutComponentBase
+@inject PortalStore Store
+@inject NavigationManager Nav
+@implements IDisposable
+
+<div class="portal-shell">
+    <aside class="sidebar" aria-label="Primary">
+        <div class="sidebar-brand">
+            <img src="images/crewhop-logo.svg" alt="CrewHop" class="sidebar-logo" />
+        </div>
+        <nav class="sidebar-nav">
+            <NavLink class="nav-item" href="dashboard" Match="NavLinkMatch.All">Dashboard</NavLink>
+            <NavLink class="nav-item" href="crew">Crew</NavLink>
+            <NavLink class="nav-item" href="shifts">Shifts</NavLink>
+            <NavLink class="nav-item" href="potato-promo">Potato promo</NavLink>
+        </nav>
+        <div class="sidebar-foot">
+            <button type="button" class="linkish" @onclick="SignOut">Sign out</button>
+        </div>
+    </aside>
+    <div class="portal-main">
+        <header class="topbar">
+            <h1 class="page-title">@_title</h1>
+        </header>
+        <main class="content">
+            @Body
+        </main>
+    </div>
+</div>
+
+@code {
+    private string _title = "CrewHop";
+
+    protected override void OnInitialized()
+    {
+        Store.Changed += OnStoreChanged;
+        Nav.LocationChanged += OnLocationChanged;
+        _title = TitleFromUri(Nav.Uri);
+    }
+
+    protected override void OnParametersSet()
+    {
+        _title = TitleFromUri(Nav.Uri);
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        _title = TitleFromUri(e.Location);
+        StateHasChanged();
+    }
+
+    private void OnStoreChanged() => InvokeAsync(StateHasChanged);
+
+    private static string TitleFromUri(string uri)
+    {
+        var path = new Uri(uri).AbsolutePath.Trim('/').ToLowerInvariant();
+        var leaf = path.Contains('/') ? path[(path.LastIndexOf('/') + 1)..] : path;
+
+        return leaf switch
+        {
+            "dashboard" => "Dashboard",
+            "crew" => "Crew",
+            "shifts" => "Shifts",
+            "potato-promo" => "Potato promo",
+            _ => "CrewHop"
+        };
+    }
+
+    private async Task SignOut()
+    {
+        await Store.SignOutAsync();
+        Nav.NavigateTo("");
+    }
+
+    public void Dispose()
+    {
+        Store.Changed -= OnStoreChanged;
+        Nav.LocationChanged -= OnLocationChanged;
+    }
+}

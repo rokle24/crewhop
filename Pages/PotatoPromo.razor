@@ -1,0 +1,44 @@
+@page "/potato-promo"
+@inject PortalStore Store
+@implements IDisposable
+
+<PageTitle>Potato promo · CrewHop</PageTitle>
+
+<section class="stack">
+    <div class="promo-hero">
+        <p class="eyebrow">@Store.Data.PotatoPromo.Title</p>
+        <h2 class="promo-title">@Store.Data.PotatoPromo.Headline</h2>
+        <p class="lede">@Store.Data.PotatoPromo.Body</p>
+        <button type="button" class="primary-btn" @onclick="Reset">@Store.Data.PotatoPromo.Cta</button>
+    </div>
+
+    <div class="stat-grid">
+        <article class="stat">
+            <span class="stat-label">Venues live</span>
+            <strong>@Store.Data.PotatoPromo.Stats.VenuesLive</strong>
+        </article>
+        <article class="stat">
+            <span class="stat-label">Shifts filled</span>
+            <strong>@Store.Data.PotatoPromo.Stats.ShiftsFilled</strong>
+        </article>
+        <article class="stat">
+            <span class="stat-label">Avg fill (min)</span>
+            <strong>@Store.Data.PotatoPromo.Stats.AvgFillMinutes</strong>
+        </article>
+        <article class="stat">
+            <span class="stat-label">Retention</span>
+            <strong>@Store.Data.PotatoPromo.Stats.RetentionPercent.ToString("0.0")%</strong>
+        </article>
+    </div>
+</section>
+
+@code {
+    protected override void OnInitialized() => Store.Changed += OnChanged;
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+    public void Dispose() => Store.Changed -= OnChanged;
+
+    private async Task Reset()
+    {
+        await Store.ResetDemoDataAsync();
+    }
+}

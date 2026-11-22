@@ -1,0 +1,345 @@
+:root {
+    --ink: #16382a;
+    --ink-soft: #3d5a4c;
+    --paper: #f7f3ea;
+    --gold: #c9a227;
+    --leaf: #1f5a40;
+    --panel: rgba(255, 252, 245, 0.82);
+    --line: rgba(22, 56, 42, 0.12);
+    --shadow: 0 18px 40px rgba(15, 36, 28, 0.08);
+    font-family: "Figtree", "Avenir Next", "Segoe UI", sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+    background:
+        radial-gradient(circle at 12% 18%, rgba(154, 211, 95, 0.18), transparent 28%),
+        radial-gradient(circle at 88% 0%, rgba(201, 162, 39, 0.16), transparent 32%),
+        linear-gradient(160deg, #f7f3ea, #e8efe3 70%);
+}
+
+h1, h2, .promo-title {
+    font-family: "Syne", sans-serif;
+    letter-spacing: -0.02em;
+}
+
+.empty-shell {
+    min-height: 100vh;
+}
+
+.login-screen {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 2rem 1rem 3rem;
+    background:
+        radial-gradient(ellipse at top, rgba(31, 90, 64, 0.35), transparent 55%),
+        linear-gradient(180deg, #0f241c 0%, #16382a 48%, #1d4734 100%);
+}
+
+.login-panel {
+    width: min(520px, 100%);
+    text-align: center;
+    color: #f4efe4;
+}
+
+.login-logo-wrap {
+    padding-top: 2.75rem;
+    margin-bottom: 1.75rem;
+}
+
+.login-logo {
+    width: 84%;
+    max-width: 440px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.28));
+}
+
+.login-panel h1 {
+    margin: 0 0 0.65rem;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+}
+
+.login-copy {
+    margin: 0 auto 1.5rem;
+    max-width: 28rem;
+    color: #d7c48a;
+    line-height: 1.5;
+}
+
+.login-note {
+    margin-top: 1rem;
+    color: rgba(244, 239, 228, 0.65);
+    font-size: 0.92rem;
+}
+
+.primary-btn {
+    appearance: none;
+    border: 0;
+    border-radius: 999px;
+    padding: 0.85rem 1.6rem;
+    background: linear-gradient(135deg, #c9a227, #e0bf4a);
+    color: #14261d;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(201, 162, 39, 0.28);
+}
+
+.primary-btn:hover {
+    filter: brightness(1.05);
+}
+
+.stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.lede {
+    margin: 0;
+    color: var(--ink-soft);
+    max-width: 42rem;
+    line-height: 1.55;
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.stat,
+.panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 1.1rem 1.2rem;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(8px);
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.stat-label {
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+}
+
+.stat strong {
+    font-family: "Syne", sans-serif;
+    font-size: 1.85rem;
+}
+
+.split {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 1rem;
+}
+
+.panel h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.2rem;
+}
+
+.panel.accent {
+    background: linear-gradient(160deg, rgba(31, 90, 64, 0.92), rgba(22, 56, 42, 0.96));
+    color: #f4efe4;
+    border-color: transparent;
+}
+
+.panel.accent .text-link {
+    color: #f0d778;
+}
+
+.plain-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.plain-list li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.plain-list span,
+.meta {
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+}
+
+.panel.accent .meta,
+.panel.accent p {
+    color: #d9d0bf;
+}
+
+.text-link {
+    color: var(--leaf);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.text-link:hover {
+    text-decoration: underline;
+}
+
+.table-wrap {
+    overflow-x: auto;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    text-align: left;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid var(--line);
+}
+
+th {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+}
+
+.pill {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: rgba(31, 90, 64, 0.12);
+    color: var(--leaf);
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.card-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.promo-hero {
+    padding: 1.5rem 1.6rem;
+    border-radius: 22px;
+    background:
+        linear-gradient(135deg, rgba(201, 162, 39, 0.18), transparent 40%),
+        linear-gradient(160deg, #214b37, #16382a);
+    color: #f4efe4;
+    box-shadow: var(--shadow);
+}
+
+.eyebrow {
+    margin: 0 0 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.78rem;
+    color: #d7c48a;
+}
+
+.promo-title {
+    margin: 0 0 0.75rem;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+}
+
+.promo-hero .lede {
+    color: #d9d0bf;
+    margin-bottom: 1.1rem;
+}
+
+.empty-state {
+    color: var(--ink-soft);
+}
+
+#blazor-error-ui {
+    background: #fff2f0;
+    bottom: 0;
+    box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.15);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
+
+.loading-progress {
+    position: relative;
+    display: block;
+    width: 8rem;
+    height: 8rem;
+    margin: 20vh auto 1rem;
+}
+
+.loading-progress circle {
+    fill: none;
+    stroke: #e4ecdf;
+    stroke-width: 0.6rem;
+    transform-origin: 50% 50%;
+    transform: rotate(-90deg);
+}
+
+.loading-progress circle:last-child {
+    stroke: #1f5a40;
+    stroke-dasharray: calc(3.141 * 80%), 500%;
+    transition: stroke-dasharray 0.05s ease-in-out;
+}
+
+.loading-progress-text {
+    text-align: center;
+    font-weight: 700;
+    color: #16382a;
+}
+
+@media (max-width: 960px) {
+    .stat-grid,
+    .split {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .stat-grid,
+    .split {
+        grid-template-columns: 1fr;
+    }
+
+    .login-logo-wrap {
+        padding-top: 2rem;
+    }
+}

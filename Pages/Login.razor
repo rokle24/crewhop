@@ -1,0 +1,26 @@
+@page "/"
+@layout EmptyLayout
+@inject PortalStore Store
+@inject NavigationManager Nav
+
+<PageTitle>Sign in · CrewHop</PageTitle>
+
+<section class="login-screen">
+    <div class="login-panel">
+        <div class="login-logo-wrap">
+            <img src="images/crewhop-logo.svg" alt="CrewHop" class="login-logo" />
+        </div>
+        <h1>Business Portal</h1>
+        <p class="login-copy">Coordinate crew, fill shifts, and run venue promos from one calm workspace.</p>
+        <button type="button" class="primary-btn" @onclick="EnterPortal">Sign in</button>
+        <p class="login-note">Demo splash only — no credentials required.</p>
+    </div>
+</section>
+
+@code {
+    private async Task EnterPortal()
+    {
+        await Store.SignInAsync();
+        Nav.NavigateTo("dashboard");
+    }
+}

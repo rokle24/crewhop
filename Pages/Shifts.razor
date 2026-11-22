@@ -1,0 +1,41 @@
+@page "/shifts"
+@inject PortalStore Store
+@implements IDisposable
+
+<PageTitle>Shifts · CrewHop</PageTitle>
+
+<section class="stack">
+    <p class="lede">Open and filled slots across the next venue windows.</p>
+
+    @if (Store.Data.Shifts.Count == 0)
+    {
+        <p class="empty-state">No shifts available.</p>
+    }
+    else
+    {
+        <div class="card-list">
+            @foreach (var shift in Store.Data.Shifts)
+            {
+                <article class="panel">
+                    <h2>@shift.Title</h2>
+                    <p>@shift.Location</p>
+                    <p class="meta">@FormatRange(shift.StartsAt, shift.EndsAt)</p>
+                    <p class="meta">Filled @shift.FilledSlots · Open @shift.OpenSlots</p>
+                </article>
+            }
+        </div>
+    }
+</section>
+
+@code {
+    protected override void OnInitialized() => Store.Changed += OnChanged;
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+    public void Dispose() => Store.Changed -= OnChanged;
+
+    private static string FormatRange(string start, string end)
+    {
+        var s = DateTime.TryParse(start, out var a) ? a.ToString("ddd d MMM HH:mm") : start;
+        var e = DateTime.TryParse(end, out var b) ? b.ToString("HH:mm") : end;
+        return $"{s} – {e}";
+    }
+}

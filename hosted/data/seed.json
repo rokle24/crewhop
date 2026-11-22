@@ -1,0 +1,33 @@
+{
+  "crew": [
+    { "id": "c1", "name": "Ava Novak", "role": "Shift Lead", "location": "Hop House Karlín", "status": "Active" },
+    { "id": "c2", "name": "Miloš Beneš", "role": "Bartender", "location": "CrewHop Depot", "status": "Active" },
+    { "id": "c3", "name": "Sofia Král", "role": "Floor Runner", "location": "Potato Lab Smíchov", "status": "On break" },
+    { "id": "c4", "name": "Erik Holm", "role": "Kitchen Prep", "location": "Hop House Karlín", "status": "Active" },
+    { "id": "c5", "name": "Nina Varga", "role": "Host", "location": "Potato Lab Smíchov", "status": "Active" }
+  ],
+  "shifts": [
+    { "id": "s1", "title": "Friday rush bar", "location": "Hop House Karlín", "startsAt": "2026-11-22T16:00:00", "endsAt": "2026-11-22T23:00:00", "openSlots": 1, "filledSlots": 3 },
+    { "id": "s2", "title": "Potato promo tasting", "location": "Potato Lab Smíchov", "startsAt": "2026-11-23T11:00:00", "endsAt": "2026-11-23T15:00:00", "openSlots": 2, "filledSlots": 2 },
+    { "id": "s3", "title": "Weekend floor cover", "location": "CrewHop Depot", "startsAt": "2026-11-23T12:00:00", "endsAt": "2026-11-23T20:00:00", "openSlots": 0, "filledSlots": 4 },
+    { "id": "s4", "title": "Monday openers", "location": "Hop House Karlín", "startsAt": "2026-11-24T09:00:00", "endsAt": "2026-11-24T14:00:00", "openSlots": 2, "filledSlots": 1 }
+  ],
+  "potatoPromo": {
+    "title": "Potato Promo",
+    "headline": "Crisp nights. Faster fills.",
+    "body": "Run the Potato Lab pop-up with CrewHop: pre-vetted hoppers, live fill stats, and venue-ready briefs so every tasting shift lands on time.",
+    "cta": "Launch potato week",
+    "stats": {
+      "venuesLive": 18,
+      "shiftsFilled": 142,
+      "avgFillMinutes": 27,
+      "retentionPercent": 91.4
+    }
+  },
+  "dashboard": {
+    "activeCrew": 48,
+    "openShifts": 5,
+    "filledToday": 12,
+    "fillRate": 86.5
+  }
+}

@@ -1,0 +1,14 @@
+## .NET
+bin/
+obj/
+publish-out/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## OS / IDE
+.DS_Store
+.idea/
+.vscode/
