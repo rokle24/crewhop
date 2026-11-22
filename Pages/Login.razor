@@ -1,26 +1,87 @@
 @page "/"
-@layout EmptyLayout
-@inject PortalStore Store
+@page "/login"
+@inject OperatorProfile Profile
 @inject NavigationManager Nav
 
 <PageTitle>Sign in · CrewHop</PageTitle>
 
-<section class="login-screen">
-    <div class="login-panel">
-        <div class="login-logo-wrap">
-            <img src="images/crewhop-logo.svg" alt="CrewHop" class="login-logo" />
+<div class="login-screen">
+    <section class="login-visual" aria-hidden="false">
+        <div class="login-brand">
+            <div class="login-brand-plate">
+                <img src="images/crewhop-logo@2x.png" alt="CrewHop" />
+            </div>
         </div>
-        <h1>Business Portal</h1>
-        <p class="login-copy">Coordinate crew, fill shifts, and run venue promos from one calm workspace.</p>
-        <button type="button" class="primary-btn" @onclick="EnterPortal">Sign in</button>
-        <p class="login-note">Demo splash only — no credentials required.</p>
-    </div>
-</section>
+        <div class="login-quote">
+            <h1>Run your venues with the same calm clarity as the CrewHop app.</h1>
+            <p>Check performance, launch promotions, and book ad space — built for busy operators.</p>
+        </div>
+        <p style="opacity:0.8;font-size:0.9rem;">Business portal</p>
+    </section>
+
+    <section class="login-panel">
+        <div class="login-card">
+            <div class="login-card-brand">
+                <img src="images/crewhop-logo.png" srcset="images/crewhop-logo.png 1x, images/crewhop-logo@2x.png 2x" alt="CrewHop" />
+            </div>
+            <h2>Sign in to your business</h2>
+            <p class="lede">Use your work email to open venues, promotions, and campaign stats.</p>
+
+            <EditForm Model="_model" OnValidSubmit="HandleContinueAsync">
+                <div class="field" style="margin-bottom:0.85rem;">
+                    <label for="email">Work email</label>
+                    <InputText id="email" @bind-Value="_model.Email" placeholder="you@yourvenue.com" autocomplete="username" />
+                </div>
+                <div class="field" style="margin-bottom:1rem;">
+                    <label for="password">Password</label>
+                    <InputText id="password" type="password" @bind-Value="_model.Password" placeholder="••••••••" autocomplete="current-password" />
+                </div>
+
+                @if (!string.IsNullOrEmpty(_error))
+                {
+                    <div class="alert alert-error" style="margin-bottom:0.9rem;">@_error</div>
+                }
+
+                <button class="btn btn-primary" style="width:100%;" type="submit" disabled="@_busy">
+                    @(_busy ? "Opening…" : "Sign in")
+                </button>
+            </EditForm>
+        </div>
+    </section>
+</div>
 
 @code {
-    private async Task EnterPortal()
+    private readonly EntryModel _model = new();
+    private string _error = "";
+    private bool _busy;
+
+    private async Task HandleContinueAsync()
     {
-        await Store.SignInAsync();
+        _error = "";
+        var email = _model.Email.Trim();
+        if (string.IsNullOrWhiteSpace(email) || !email.Contains('@'))
+        {
+            _error = "Enter a work email to continue.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_model.Password))
+        {
+            _error = "Enter your password to continue.";
+            return;
+        }
+
+        _busy = true;
+        var local = email.Split('@')[0].Replace('.', ' ').Replace('_', ' ').Replace('-', ' ');
+        var name = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(local);
+        await Profile.SetAsync(email, name);
+        _busy = false;
         Nav.NavigateTo("dashboard");
+    }
+
+    private sealed class EntryModel
+    {
+        public string Email { get; set; } = "";
+        public string Password { get; set; } = "";
     }
 }

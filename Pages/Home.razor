@@ -1,0 +1,149 @@
+﻿@page "/dashboard"
+@inject PortalStore Store
+@implements IDisposable
+
+<PageTitle>Dashboard · CrewHop</PageTitle>
+
+@if (!_ready)
+{
+    <div class="page"><p class="muted">Loading…</p></div>
+}
+else
+{
+    <div class="page">
+        <div class="page-header">
+            <div>
+                <p class="lede">Here’s how @_business is performing across venues, promotions, and ads.</p>
+            </div>
+            <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+                <a class="btn btn-primary" href="promotions">Create promotion</a>
+                <a class="btn btn-secondary" href="campaigns">New ad campaign</a>
+            </div>
+        </div>
+
+        <div class="grid grid-4" style="margin-bottom:1rem;">
+            <div class="stat-card">
+                <div class="stat-label">Active venues</div>
+                <div class="stat-value">@_activeVenues</div>
+                <div class="stat-hint">@_venues.Count total locations</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Running promotions</div>
+                <div class="stat-value">@_runningPromos</div>
+                <div class="stat-hint">@_promoViews.ToString("N0") views this period</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Ad bookings</div>
+                <div class="stat-value">@_bookings.ToString("N0")</div>
+                <div class="stat-hint">From @_runningCampaigns live campaigns</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Weekly visitors</div>
+                <div class="stat-value">@_weeklyVisitors.ToString("N0")</div>
+                <div class="stat-hint">Across all venues</div>
+            </div>
+        </div>
+
+        <div class="split-layout">
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Your venues</h2>
+                    <a class="btn btn-ghost btn-sm" href="venues">View all</a>
+                </div>
+                <div class="grid" style="gap:0.75rem;">
+                    @foreach (var venue in _venues.Take(4))
+                    {
+                        <div style="display:flex;justify-content:space-between;gap:0.75rem;align-items:center;padding:0.7rem 0;border-bottom:1px solid var(--ch-border);">
+                            <div>
+                                <strong>@venue.Name</strong>
+                                <div class="muted" style="font-size:0.85rem;">@venue.Category · @venue.City</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <StatusBadge Status="@venue.Status" />
+                                <div class="muted" style="font-size:0.8rem;margin-top:0.25rem;">@venue.WeeklyVisitors.ToString("N0") / wk</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Promotion performance</h2>
+                    <a class="btn btn-ghost btn-sm" href="promotions">Manage</a>
+                </div>
+                @foreach (var promo in _promotions.Where(p => p.Status == "Running").Take(3))
+                {
+                    var venue = Store.GetVenue(promo.VenueId);
+                    var rate = promo.Views == 0 ? 0 : (double)promo.Redemptions / promo.Views * 100;
+                    <div style="margin-bottom:1rem;">
+                        <div class="card-top">
+                            <div>
+                                <strong>@promo.Title</strong>
+                                <div class="muted" style="font-size:0.85rem;">@(venue?.Name ?? "Venue") · @promo.DiscountLabel</div>
+                            </div>
+                            <StatusBadge Status="@promo.Status" />
+                        </div>
+                        <div class="metric-row" style="margin-top:0.65rem;">
+                            <div class="metric">
+                                <div class="label">Views</div>
+                                <div class="value">@promo.Views.ToString("N0")</div>
+                            </div>
+                            <div class="metric">
+                                <div class="label">Redeemed</div>
+                                <div class="value">@promo.Redemptions.ToString("N0")</div>
+                            </div>
+                            <div class="metric">
+                                <div class="label">Conv.</div>
+                                <div class="value">@rate.ToString("0.0")%</div>
+                            </div>
+                        </div>
+                        <div class="performance-bar"><span style="width:@Math.Clamp(rate * 4, 8, 100)%;"></span></div>
+                    </div>
+                }
+            </section>
+        </div>
+    </div>
+}
+
+@code {
+    private bool _ready;
+    private string _business = "";
+    private List<Venue> _venues = [];
+    private List<Promotion> _promotions = [];
+    private int _activeVenues;
+    private int _runningPromos;
+    private int _runningCampaigns;
+    private int _promoViews;
+    private int _bookings;
+    private int _weeklyVisitors;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Store.Changed += OnStoreChanged;
+        await Store.EnsureLoadedAsync();
+        Refresh();
+        _ready = true;
+    }
+
+    private void OnStoreChanged()
+    {
+        Refresh();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void Refresh()
+    {
+        _business = Store.Business.Name;
+        _venues = Store.Venues.ToList();
+        _promotions = Store.Promotions.ToList();
+        _activeVenues = _venues.Count(v => v.Status is "Active" or "Seasonal");
+        _runningPromos = _promotions.Count(p => p.Status == "Running");
+        _runningCampaigns = Store.Campaigns.Count(c => c.Status == "Running");
+        _promoViews = _promotions.Sum(p => p.Views);
+        _bookings = Store.Campaigns.Sum(c => c.Bookings);
+        _weeklyVisitors = _venues.Sum(v => v.WeeklyVisitors);
+    }
+
+    public void Dispose() => Store.Changed -= OnStoreChanged;
+}

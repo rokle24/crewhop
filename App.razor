@@ -1,21 +1,18 @@
-﻿@inject PortalStore Store
-
-<Router AppAssembly="@typeof(App).Assembly">
+﻿<Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
     <NotFound>
-        <PageTitle>Not found</PageTitle>
+        <PageTitle>Not found · CrewHop</PageTitle>
         <LayoutView Layout="@typeof(MainLayout)">
-            <p class="empty-state" role="alert">That route is not in the CrewHop portal.</p>
+            <div class="page">
+                <div class="panel empty-state">
+                    <h2>Page not found</h2>
+                    <p class="muted" style="margin-top:0.5rem;">That link doesn’t exist in the business portal.</p>
+                    <a class="btn btn-primary" style="margin-top:1rem;" href="dashboard">Back to dashboard</a>
+                </div>
+            </div>
         </LayoutView>
     </NotFound>
 </Router>
-
-@code {
-    protected override async Task OnInitializedAsync()
-    {
-        await Store.InitializeAsync();
-    }
-}

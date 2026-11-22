@@ -1,0 +1,101 @@
+@page "/venues"
+@inject PortalStore Store
+@implements IDisposable
+
+<PageTitle>Venues · CrewHop</PageTitle>
+
+@if (!_ready)
+{
+    <div class="page"><p class="muted">Loading venues…</p></div>
+}
+else
+{
+    <div class="page">
+        <div class="page-header">
+            <div>
+                <p class="lede">Every location under @Store.Business.Name — visitors, ratings, and status at a glance.</p>
+            </div>
+        </div>
+
+        @if (!Store.Venues.Any())
+        {
+            <div class="panel empty-state">
+                <h2>No venues yet</h2>
+                <p class="muted" style="margin-top:0.5rem;">Add locations from your CrewHop onboarding flow to manage them here.</p>
+            </div>
+        }
+        else
+        {
+            <div class="grid grid-2">
+                @foreach (var venue in Store.Venues)
+                {
+                    var promos = Store.PromotionsForVenue(venue.Id).Count(p => p.Status == "Running");
+                    var campaigns = Store.CampaignsForVenue(venue.Id).Count();
+                    <article class="venue-card">
+                        <div class="venue-visual @venue.ImageTone"></div>
+                        <div class="venue-body">
+                            <div class="card-top">
+                                <div>
+                                    <h3>@venue.Name</h3>
+                                    <div class="muted" style="font-size:0.86rem;">@venue.Category</div>
+                                </div>
+                                <StatusBadge Status="@venue.Status" />
+                            </div>
+                            <div class="venue-meta">
+                                <span>@venue.Address, @venue.City</span>
+                                <span>★ @venue.Rating.ToString("0.0")</span>
+                            </div>
+                            <div class="metric-row">
+                                <div class="metric">
+                                    <div class="label">Weekly visitors</div>
+                                    <div class="value">@venue.WeeklyVisitors.ToString("N0")</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="label">Promotions</div>
+                                    <div class="value">@promos</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="label">Campaigns</div>
+                                    <div class="value">@campaigns</div>
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                <a class="btn btn-primary btn-sm" href="promotions?venue=@venue.Id">Add promotion</a>
+                                <a class="btn btn-ghost btn-sm" href="campaigns?venue=@venue.Id">Advertise</a>
+                                @if (venue.Status is "Active" or "Seasonal")
+                                {
+                                    <button type="button" class="btn btn-ghost btn-sm" @onclick='() => SetStatusAsync(venue.Id, "Paused")'>Pause</button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-secondary btn-sm" @onclick='() => SetStatusAsync(venue.Id, "Active")'>Activate</button>
+                                }
+                                <button type="button" class="btn btn-danger btn-sm" @onclick="() => RemoveAsync(venue.Id)">Remove</button>
+                            </div>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private bool _ready;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Store.Changed += OnChanged;
+
+        await Store.EnsureLoadedAsync();
+        _ready = true;
+    }
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    private Task SetStatusAsync(string id, string status) => Store.SetVenueStatusAsync(id, status);
+
+    private Task RemoveAsync(string id) => Store.RemoveVenueAsync(id);
+
+    public void Dispose() => Store.Changed -= OnChanged;
+}

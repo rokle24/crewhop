@@ -1,28 +1,37 @@
 # CrewHop Business Portal
 
-Blazor WebAssembly business portal for coordinating crew, shifts, and venue promos.
+Blazor WebAssembly portal for venue operators: sign in, review venues, create promotions, launch ad campaigns, and browse performance stats. Data is backed by a JSON seed file and browser storage for this slice of the product.
 
 ## Run locally
 
-```bash
-dotnet run
-```
-
-Open the printed localhost URL. Sign in from the splash (demo only — no credentials), then use the sidebar for Dashboard, Crew, Shifts, and Potato promo.
-
-Demo data lives in `wwwroot/data/seed.json` and is cached in browser `localStorage`.
-
-## Static build
-
-Release output for hosting is committed under `hosted/` (base href set for GitHub Pages project site `/crewhop/`).
+Requires [.NET 8 SDK](https://dotnet.microsoft.com/download).
 
 ```bash
-dotnet publish -c Release -o ./publish-out
-# then copy publish-out/wwwroot → hosted and set <base href="/crewhop/" />
+dotnet restore
+dotnet run --urls http://127.0.0.1:3847
 ```
 
-## GitHub Pages
+Open [http://127.0.0.1:3847](http://127.0.0.1:3847) and sign in with any work email and password.
 
-Pushing `main` to GitHub runs `.github/workflows/pages.yml`, which deploys the `hosted/` folder.
+## What’s included
 
-Live site: https://rokle24.github.io/crewhop/
+- Business login
+- Dashboard with venues, promotions, and stats
+- Venues overview
+- Promotions list + create form + performance metrics
+- Ad campaign planner per venue
+- CrewHop color palette, Plus Jakarta Sans, and official logo
+
+## Brand assets
+
+Official logo: `wwwroot/images/crewhop-logo.png` (and `@2x`). Pin mark / favicon: `wwwroot/images/crewhop-mark.png`.
+
+## Refresh static host build
+
+```bash
+dotnet publish -c Release -o /tmp/crewhop-publish
+rm -rf hosted && mkdir -p hosted
+cp -a /tmp/crewhop-publish/wwwroot/. hosted/
+rm -f hosted/_framework/*.pdb*
+cp hosted/index.html hosted/200.html
+```

@@ -1,80 +1,121 @@
 ﻿@inherits LayoutComponentBase
+@inject OperatorProfile Profile
 @inject PortalStore Store
 @inject NavigationManager Nav
 @implements IDisposable
 
-<div class="portal-shell">
-    <aside class="sidebar" aria-label="Primary">
-        <div class="sidebar-brand">
-            <img src="images/crewhop-logo.svg" alt="CrewHop" class="sidebar-logo" />
-        </div>
-        <nav class="sidebar-nav">
-            <NavLink class="nav-item" href="dashboard" Match="NavLinkMatch.All">Dashboard</NavLink>
-            <NavLink class="nav-item" href="crew">Crew</NavLink>
-            <NavLink class="nav-item" href="shifts">Shifts</NavLink>
-            <NavLink class="nav-item" href="potato-promo">Potato promo</NavLink>
-        </nav>
-        <div class="sidebar-foot">
-            <button type="button" class="linkish" @onclick="SignOut">Sign out</button>
-        </div>
-    </aside>
-    <div class="portal-main">
-        <header class="topbar">
-            <h1 class="page-title">@_title</h1>
-        </header>
-        <main class="content">
-            @Body
-        </main>
+@if (!_ready)
+{
+    <div class="page" style="padding-top:20vh;text-align:center;">
+        <p class="muted">Loading CrewHop…</p>
     </div>
-</div>
+}
+else if (_onEntry)
+{
+    @Body
+}
+else
+{
+    <div class="shell">
+        <aside class="sidebar">
+            <div class="brand-lockup">
+                <img class="logo" src="images/crewhop-logo.png" srcset="images/crewhop-logo.png 1x, images/crewhop-logo@2x.png 2x" alt="CrewHop" />
+                <span class="brand-tag">Business portal</span>
+            </div>
+
+            <nav class="nav-list" aria-label="Primary">
+                <NavLink class="nav-link" href="dashboard" Match="NavLinkMatch.All">
+                    <span class="nav-icon">▣</span> Dashboard
+                </NavLink>
+                <NavLink class="nav-link" href="venues">
+                    <span class="nav-icon">⌂</span> Venues
+                </NavLink>
+                <NavLink class="nav-link" href="promotions">
+                    <span class="nav-icon">◈</span> Promotions
+                </NavLink>
+                <NavLink class="nav-link" href="campaigns">
+                    <span class="nav-icon">◎</span> Ad campaigns
+                </NavLink>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="who">@_displayName</div>
+                <div class="meta">@_email</div>
+                <button class="btn btn-ghost btn-sm" style="width:100%;" @onclick="ExitAsync">Sign out</button>
+            </div>
+        </aside>
+
+        <div class="main-panel">
+            <div class="mobile-top">
+                <div class="brand-lockup">
+                    <img class="logo logo-sm" src="images/crewhop-logo.png" srcset="images/crewhop-logo.png 1x, images/crewhop-logo@2x.png 2x" alt="CrewHop" />
+                </div>
+                <button class="btn btn-ghost btn-sm" @onclick="ExitAsync">Sign out</button>
+            </div>
+            <div class="page-titlebar">
+                <h1 class="page-titlebar-label">@CurrentPageTitle</h1>
+            </div>
+            @Body
+        </div>
+    </div>
+}
 
 @code {
-    private string _title = "CrewHop";
+    private bool _ready;
+    private bool _onEntry;
+    private string _displayName = "";
+    private string _email = "";
 
-    protected override void OnInitialized()
+    private string CurrentPageTitle
     {
-        Store.Changed += OnStoreChanged;
-        Nav.LocationChanged += OnLocationChanged;
-        _title = TitleFromUri(Nav.Uri);
+        get
+        {
+            var path = Nav.ToBaseRelativePath(Nav.Uri).Split('?', '#')[0].Trim('/').ToLowerInvariant();
+            return path switch
+            {
+                "dashboard" => $"Welcome back, {_displayName.Split(' ').FirstOrDefault()}",
+                "venues" => "Your venues",
+                "promotions" => "Promotions",
+                "campaigns" => "Ad campaigns",
+                _ => "CrewHop"
+            };
+        }
     }
 
-    protected override void OnParametersSet()
+    protected override async Task OnInitializedAsync()
     {
-        _title = TitleFromUri(Nav.Uri);
+        Nav.LocationChanged += OnLocationChanged;
+        await Profile.EnsureHydratedAsync();
+        await Store.EnsureLoadedAsync();
+        RefreshProfileLabels();
+        _ready = true;
+        UpdateEntryFlag();
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
-        _title = TitleFromUri(e.Location);
-        StateHasChanged();
+        UpdateEntryFlag();
+        InvokeAsync(StateHasChanged);
     }
 
-    private void OnStoreChanged() => InvokeAsync(StateHasChanged);
-
-    private static string TitleFromUri(string uri)
+    private void UpdateEntryFlag()
     {
-        var path = new Uri(uri).AbsolutePath.Trim('/').ToLowerInvariant();
-        var leaf = path.Contains('/') ? path[(path.LastIndexOf('/') + 1)..] : path;
-
-        return leaf switch
-        {
-            "dashboard" => "Dashboard",
-            "crew" => "Crew",
-            "shifts" => "Shifts",
-            "potato-promo" => "Potato promo",
-            _ => "CrewHop"
-        };
+        var path = Nav.ToBaseRelativePath(Nav.Uri).Split('?', '#')[0].Trim('/');
+        _onEntry = string.IsNullOrEmpty(path) || path.Equals("login", StringComparison.OrdinalIgnoreCase);
     }
 
-    private async Task SignOut()
+    private void RefreshProfileLabels()
     {
-        await Store.SignOutAsync();
-        Nav.NavigateTo("");
+        _displayName = Profile.HasProfile ? Profile.DisplayName : Store.Business.OwnerName;
+        _email = Profile.HasProfile ? Profile.Email : Store.Business.ContactEmail;
     }
 
-    public void Dispose()
+    private async Task ExitAsync()
     {
-        Store.Changed -= OnStoreChanged;
-        Nav.LocationChanged -= OnLocationChanged;
+        await Profile.ClearAsync();
+        RefreshProfileLabels();
+        Nav.NavigateTo("/");
     }
+
+    public void Dispose() => Nav.LocationChanged -= OnLocationChanged;
 }

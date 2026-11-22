@@ -1,0 +1,248 @@
+@page "/promotions"
+@inject PortalStore Store
+@inject NavigationManager Nav
+@implements IDisposable
+
+<PageTitle>Promotions · CrewHop</PageTitle>
+
+@if (!_ready)
+{
+    <div class="page"><p class="muted">Loading promotions…</p></div>
+}
+else
+{
+    <div class="page">
+        <div class="page-header">
+            <div>
+                <p class="lede">Create offers guests can redeem in the CrewHop app, and see how the live ones are doing.</p>
+            </div>
+            <button class="btn btn-primary" @onclick="() => _showForm = !_showForm">
+                @(_showForm ? "Hide form" : "Create promotion")
+            </button>
+        </div>
+
+        @if (_showForm)
+        {
+            <section class="panel" style="margin-bottom:1rem;">
+                <div class="panel-header">
+                    <h2>New promotion</h2>
+                </div>
+
+                <EditForm Model="_form" OnValidSubmit="CreateAsync">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="promo-venue">Venue</label>
+                            <InputSelect id="promo-venue" @bind-Value="_form.VenueId">
+                                <option value="">Select a venue…</option>
+                                @foreach (var venue in Store.Venues)
+                                {
+                                    <option value="@venue.Id">@venue.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="field">
+                            <label for="promo-discount">Offer label</label>
+                            <InputText id="promo-discount" @bind-Value="_form.DiscountLabel" placeholder="e.g. 15% off" />
+                        </div>
+                        <div class="field full">
+                            <label for="promo-title">Title</label>
+                            <InputText id="promo-title" @bind-Value="_form.Title" placeholder="Weekend tasting flight" />
+                        </div>
+                        <div class="field full">
+                            <label for="promo-desc">Description</label>
+                            <InputTextArea id="promo-desc" @bind-Value="_form.Description" placeholder="What guests get, and when it applies." />
+                        </div>
+                        <div class="field">
+                            <label for="promo-start">Starts</label>
+                            <InputDate id="promo-start" @bind-Value="_form.StartDate" />
+                        </div>
+                        <div class="field">
+                            <label for="promo-end">Ends</label>
+                            <InputDate id="promo-end" @bind-Value="_form.EndDate" />
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(_error))
+                    {
+                        <div class="alert alert-error" style="margin-top:0.9rem;">@_error</div>
+                    }
+                    @if (!string.IsNullOrEmpty(_success))
+                    {
+                        <div class="alert alert-success" style="margin-top:0.9rem;">@_success</div>
+                    }
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-ghost" @onclick="() => _showForm = false">Cancel</button>
+                        <button type="submit" class="btn btn-primary" disabled="@_busy">
+                            @(_busy ? "Saving…" : "Publish promotion")
+                        </button>
+                    </div>
+                </EditForm>
+            </section>
+        }
+
+        <div class="grid grid-4" style="margin-bottom:1rem;">
+            <div class="stat-card">
+                <div class="stat-label">Running</div>
+                <div class="stat-value">@_running</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total views</div>
+                <div class="stat-value">@_views.ToString("N0")</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Redemptions</div>
+                <div class="stat-value">@_redemptions.ToString("N0")</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg. conversion</div>
+                <div class="stat-value">@_avgConv.ToString("0.0")%</div>
+            </div>
+        </div>
+
+        <div class="grid grid-2">
+            @foreach (var promo in Store.Promotions)
+            {
+                var venue = Store.GetVenue(promo.VenueId);
+                var rate = promo.Views == 0 ? 0 : (double)promo.Redemptions / promo.Views * 100;
+                <article class="promo-card">
+                    <div class="card-top">
+                        <div>
+                            <h3>@promo.Title</h3>
+                            <div class="muted" style="font-size:0.86rem;">@(venue?.Name ?? "Unknown venue") · @promo.DiscountLabel</div>
+                        </div>
+                        <StatusBadge Status="@promo.Status" />
+                    </div>
+                    <p class="muted">@promo.Description</p>
+                    <div class="muted" style="font-size:0.82rem;">
+                        @promo.StartDate.ToString("dd MMM yyyy") – @promo.EndDate.ToString("dd MMM yyyy")
+                    </div>
+                    <div class="metric-row">
+                        <div class="metric">
+                            <div class="label">Views</div>
+                            <div class="value">@promo.Views.ToString("N0")</div>
+                        </div>
+                        <div class="metric">
+                            <div class="label">Redeemed</div>
+                            <div class="value">@promo.Redemptions.ToString("N0")</div>
+                        </div>
+                        <div class="metric">
+                            <div class="label">Spend</div>
+                            <div class="value">€@promo.Spend.ToString("0")</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="muted" style="font-size:0.8rem;">Conversion @rate.ToString("0.0")%</div>
+                        <div class="performance-bar"><span style="width:@Math.Clamp(rate * 4, 6, 100)%;"></span></div>
+                    </div>
+                    <div class="card-actions" aria-label="Manage promotion">
+                        @if (promo.Status is "Running" or "Scheduled")
+                        {
+                            <button type="button" class="btn btn-ghost btn-sm" @onclick='() => SetStatusAsync(promo.Id, "Paused")'>Pause</button>
+                            <button type="button" class="btn btn-secondary btn-sm" @onclick='() => SetStatusAsync(promo.Id, "Ended")'>Stop</button>
+                        }
+                        else if (promo.Status == "Paused")
+                        {
+                            <button type="button" class="btn btn-primary btn-sm" @onclick='() => SetStatusAsync(promo.Id, "Running")'>Resume</button>
+                            <button type="button" class="btn btn-secondary btn-sm" @onclick='() => SetStatusAsync(promo.Id, "Ended")'>Stop</button>
+                        }
+                        else if (promo.Status == "Ended")
+                        {
+                            <button type="button" class="btn btn-primary btn-sm" @onclick='() => SetStatusAsync(promo.Id, "Running")'>Restart</button>
+                        }
+                        <button type="button" class="btn btn-danger btn-sm" @onclick="() => RemoveAsync(promo.Id)">Remove</button>
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private bool _ready;
+    private bool _showForm;
+    private bool _busy;
+    private string _error = "";
+    private string _success = "";
+    private CreatePromotionRequest _form = new();
+    private int _running;
+    private int _views;
+    private int _redemptions;
+    private double _avgConv;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Store.Changed += OnChanged;
+
+        await Store.EnsureLoadedAsync();
+        PrefillVenueFromQuery();
+        RefreshStats();
+        _ready = true;
+    }
+
+    private void PrefillVenueFromQuery()
+    {
+        var venueId = QueryString.Get(Nav.Uri, "venue");
+        if (!string.IsNullOrWhiteSpace(venueId))
+        {
+            _form.VenueId = venueId;
+            _showForm = true;
+        }
+        else if (Store.Venues.Count > 0)
+        {
+            _form.VenueId = Store.Venues[0].Id;
+        }
+    }
+
+    private void OnChanged()
+    {
+        RefreshStats();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void RefreshStats()
+    {
+        var list = Store.Promotions;
+        _running = list.Count(p => p.Status == "Running");
+        _views = list.Sum(p => p.Views);
+        _redemptions = list.Sum(p => p.Redemptions);
+        _avgConv = _views == 0 ? 0 : (double)_redemptions / _views * 100;
+    }
+
+    private async Task CreateAsync()
+    {
+        _error = "";
+        _success = "";
+
+        if (string.IsNullOrWhiteSpace(_form.VenueId) ||
+            string.IsNullOrWhiteSpace(_form.Title) ||
+            string.IsNullOrWhiteSpace(_form.DiscountLabel))
+        {
+            _error = "Pick a venue and add a title plus offer label.";
+            return;
+        }
+
+        if (_form.EndDate < _form.StartDate)
+        {
+            _error = "The end date needs to be on or after the start date.";
+            return;
+        }
+
+        _busy = true;
+        await Store.AddPromotionAsync(_form);
+        _busy = false;
+        _success = $"“{_form.Title}” is live and will show on the promotions list.";
+        _form = new CreatePromotionRequest
+        {
+            VenueId = Store.Venues.FirstOrDefault()?.Id ?? "",
+            StartDate = DateOnly.FromDateTime(DateTime.Today),
+            EndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(30))
+        };
+    }
+
+    private Task SetStatusAsync(string id, string status) => Store.SetPromotionStatusAsync(id, status);
+
+    private Task RemoveAsync(string id) => Store.RemovePromotionAsync(id);
+
+    public void Dispose() => Store.Changed -= OnChanged;
+}

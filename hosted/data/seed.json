@@ -1,33 +1,178 @@
 {
-  "crew": [
-    { "id": "c1", "name": "Ava Novak", "role": "Shift Lead", "location": "Hop House Karlín", "status": "Active" },
-    { "id": "c2", "name": "Miloš Beneš", "role": "Bartender", "location": "CrewHop Depot", "status": "Active" },
-    { "id": "c3", "name": "Sofia Král", "role": "Floor Runner", "location": "Potato Lab Smíchov", "status": "On break" },
-    { "id": "c4", "name": "Erik Holm", "role": "Kitchen Prep", "location": "Hop House Karlín", "status": "Active" },
-    { "id": "c5", "name": "Nina Varga", "role": "Host", "location": "Potato Lab Smíchov", "status": "Active" }
-  ],
-  "shifts": [
-    { "id": "s1", "title": "Friday rush bar", "location": "Hop House Karlín", "startsAt": "2026-11-22T16:00:00", "endsAt": "2026-11-22T23:00:00", "openSlots": 1, "filledSlots": 3 },
-    { "id": "s2", "title": "Potato promo tasting", "location": "Potato Lab Smíchov", "startsAt": "2026-11-23T11:00:00", "endsAt": "2026-11-23T15:00:00", "openSlots": 2, "filledSlots": 2 },
-    { "id": "s3", "title": "Weekend floor cover", "location": "CrewHop Depot", "startsAt": "2026-11-23T12:00:00", "endsAt": "2026-11-23T20:00:00", "openSlots": 0, "filledSlots": 4 },
-    { "id": "s4", "title": "Monday openers", "location": "Hop House Karlín", "startsAt": "2026-11-24T09:00:00", "endsAt": "2026-11-24T14:00:00", "openSlots": 2, "filledSlots": 1 }
-  ],
-  "potatoPromo": {
-    "title": "Potato Promo",
-    "headline": "Crisp nights. Faster fills.",
-    "body": "Run the Potato Lab pop-up with CrewHop: pre-vetted hoppers, live fill stats, and venue-ready briefs so every tasting shift lands on time.",
-    "cta": "Launch potato week",
-    "stats": {
-      "venuesLive": 18,
-      "shiftsFilled": 142,
-      "avgFillMinutes": 27,
-      "retentionPercent": 91.4
-    }
+  "business": {
+    "id": "biz-harbor-vine",
+    "name": "Harbor & Vine Hospitality",
+    "contactEmail": "maya@harborvine.com",
+    "ownerName": "Maya Ortega"
   },
-  "dashboard": {
-    "activeCrew": 48,
-    "openShifts": 5,
-    "filledToday": 12,
-    "fillRate": 86.5
-  }
+  "venues": [
+    {
+      "id": "venue-oak-room",
+      "name": "The Oak Room",
+      "category": "Restaurant",
+      "address": "18 Linden Street",
+      "city": "Budapest",
+      "status": "Active",
+      "weeklyVisitors": 1840,
+      "rating": 4.7,
+      "imageTone": "forest"
+    },
+    {
+      "id": "venue-blue-harbor",
+      "name": "Blue Harbor Café",
+      "category": "Café",
+      "address": "4 Danube Walk",
+      "city": "Budapest",
+      "status": "Active",
+      "weeklyVisitors": 2210,
+      "rating": 4.5,
+      "imageTone": "blue"
+    },
+    {
+      "id": "venue-nightingale",
+      "name": "Nightingale Lounge",
+      "category": "Bar & Lounge",
+      "address": "9 Ember Lane",
+      "city": "Budapest",
+      "status": "Active",
+      "weeklyVisitors": 1560,
+      "rating": 4.8,
+      "imageTone": "sand"
+    },
+    {
+      "id": "venue-riverside",
+      "name": "Riverside Terrace",
+      "category": "Outdoor Dining",
+      "address": "22 Quay Avenue",
+      "city": "Budapest",
+      "status": "Seasonal",
+      "weeklyVisitors": 980,
+      "rating": 4.6,
+      "imageTone": "mist"
+    }
+  ],
+  "promotions": [
+    {
+      "id": "promo-potato",
+      "venueId": "venue-oak-room",
+      "title": "Potato",
+      "description": "Pay twice, get nothing",
+      "status": "Running",
+      "startDate": "2026-11-21",
+      "endDate": "2026-12-31",
+      "discountLabel": "-200% off",
+      "views": 2840,
+      "redemptions": 317,
+      "spend": 88
+    },
+    {
+      "id": "promo-happy-hour",
+      "venueId": "venue-nightingale",
+      "title": "Golden Hour Cocktails",
+      "description": "Two signature cocktails for the price of one every weekday from 5–7pm.",
+      "status": "Running",
+      "startDate": "2026-11-01",
+      "endDate": "2026-12-15",
+      "discountLabel": "2-for-1",
+      "views": 4820,
+      "redemptions": 612,
+      "spend": 180
+    },
+    {
+      "id": "promo-brunch",
+      "venueId": "venue-blue-harbor",
+      "title": "Weekend Brunch Pass",
+      "description": "Complimentary pastry with any brunch plate booked through CrewHop.",
+      "status": "Running",
+      "startDate": "2026-10-20",
+      "endDate": "2026-11-30",
+      "discountLabel": "Free pastry",
+      "views": 3650,
+      "redemptions": 441,
+      "spend": 95
+    },
+    {
+      "id": "promo-chef-table",
+      "venueId": "venue-oak-room",
+      "title": "Chef’s Table Tuesday",
+      "description": "20% off the tasting menu for parties of two or more on Tuesdays.",
+      "status": "Running",
+      "startDate": "2026-11-10",
+      "endDate": "2026-12-31",
+      "discountLabel": "20% off",
+      "views": 2140,
+      "redemptions": 168,
+      "spend": 140
+    },
+    {
+      "id": "promo-sunset",
+      "venueId": "venue-riverside",
+      "title": "Sunset Terrace Seats",
+      "description": "Early-bird outdoor seating with a complimentary house lemonade.",
+      "status": "Scheduled",
+      "startDate": "2026-12-01",
+      "endDate": "2027-02-28",
+      "discountLabel": "Free drink",
+      "views": 420,
+      "redemptions": 0,
+      "spend": 40
+    },
+    {
+      "id": "promo-ended",
+      "venueId": "venue-oak-room",
+      "title": "Harvest Menu Preview",
+      "description": "Limited autumn tasting flights for CrewHop members.",
+      "status": "Ended",
+      "startDate": "2026-09-01",
+      "endDate": "2026-10-15",
+      "discountLabel": "Member only",
+      "views": 5120,
+      "redemptions": 703,
+      "spend": 210
+    }
+  ],
+  "campaigns": [
+    {
+      "id": "camp-oak-awareness",
+      "venueId": "venue-oak-room",
+      "name": "Oak Room Autumn Awareness",
+      "objective": "Brand awareness",
+      "audience": "Food lovers within 5 km",
+      "budget": 450,
+      "status": "Running",
+      "startDate": "2026-11-01",
+      "endDate": "2026-11-30",
+      "impressions": 28400,
+      "clicks": 1260,
+      "bookings": 94
+    },
+    {
+      "id": "camp-harbor-lunch",
+      "venueId": "venue-blue-harbor",
+      "name": "Café Lunch Boost",
+      "objective": "Increase foot traffic",
+      "audience": "Office workers nearby",
+      "budget": 280,
+      "status": "Running",
+      "startDate": "2026-11-08",
+      "endDate": "2026-11-28",
+      "impressions": 15200,
+      "clicks": 890,
+      "bookings": 112
+    },
+    {
+      "id": "camp-night-weekend",
+      "venueId": "venue-nightingale",
+      "name": "Weekend Lounge Push",
+      "objective": "Drive reservations",
+      "audience": "Nightlife seekers 25–40",
+      "budget": 520,
+      "status": "Scheduled",
+      "startDate": "2026-12-05",
+      "endDate": "2026-12-20",
+      "impressions": 0,
+      "clicks": 0,
+      "bookings": 0
+    }
+  ]
 }

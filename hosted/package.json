@@ -1,0 +1,5 @@
+{
+  "name": "crewhop",
+  "private": true,
+  "scripts": { "build": "echo ready" }
+}

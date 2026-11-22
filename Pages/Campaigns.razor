@@ -1,0 +1,289 @@
+@page "/campaigns"
+@inject PortalStore Store
+@inject NavigationManager Nav
+@implements IDisposable
+
+<PageTitle>Ad campaigns · CrewHop</PageTitle>
+
+@if (!_ready)
+{
+    <div class="page"><p class="muted">Loading campaigns…</p></div>
+}
+else
+{
+    <div class="page">
+        <div class="page-header">
+            <div>
+                <p class="lede">Promote a venue to nearby CrewHop guests. Set a budget, pick an audience, and track bookings.</p>
+            </div>
+            <button class="btn btn-primary" @onclick="() => _showForm = !_showForm">
+                @(_showForm ? "Hide form" : "Create campaign")
+            </button>
+        </div>
+
+        <div class="split-layout">
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>@( _showForm ? "New ad campaign" : "Campaign planner")</h2>
+                </div>
+
+                @if (_showForm)
+                {
+                    <EditForm Model="_form" OnValidSubmit="CreateAsync">
+                        <div class="form-grid">
+                            <div class="field full">
+                                <label for="camp-venue">Venue</label>
+                                <InputSelect id="camp-venue" @bind-Value="_form.VenueId">
+                                    <option value="">Select a venue…</option>
+                                    @foreach (var venue in Store.Venues)
+                                    {
+                                        <option value="@venue.Id">@venue.Name</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="field full">
+                                <label for="camp-name">Campaign name</label>
+                                <InputText id="camp-name" @bind-Value="_form.Name" placeholder="Spring terrace push" />
+                            </div>
+                            <div class="field">
+                                <label for="camp-objective">Objective</label>
+                                <InputSelect id="camp-objective" @bind-Value="_form.Objective">
+                                    <option>Increase foot traffic</option>
+                                    <option>Drive reservations</option>
+                                    <option>Brand awareness</option>
+                                    <option>Promote a new menu</option>
+                                </InputSelect>
+                            </div>
+                            <div class="field">
+                                <label for="camp-audience">Audience</label>
+                                <InputSelect id="camp-audience" @bind-Value="_form.Audience">
+                                    <option>Locals nearby</option>
+                                    <option>Office workers nearby</option>
+                                    <option>Food lovers within 5 km</option>
+                                    <option>Nightlife seekers 25–40</option>
+                                    <option>Weekend explorers</option>
+                                </InputSelect>
+                            </div>
+                            <div class="field">
+                                <label for="camp-budget">Budget (€)</label>
+                                <InputNumber id="camp-budget" @bind-Value="_form.Budget" />
+                            </div>
+                            <div class="field">
+                                <label for="camp-start">Starts</label>
+                                <InputDate id="camp-start" @bind-Value="_form.StartDate" />
+                            </div>
+                            <div class="field">
+                                <label for="camp-end">Ends</label>
+                                <InputDate id="camp-end" @bind-Value="_form.EndDate" />
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(_error))
+                        {
+                            <div class="alert alert-error" style="margin-top:0.9rem;">@_error</div>
+                        }
+                        @if (!string.IsNullOrEmpty(_success))
+                        {
+                            <div class="alert alert-success" style="margin-top:0.9rem;">@_success</div>
+                        }
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-ghost" @onclick="() => _showForm = false">Cancel</button>
+                            <button type="submit" class="btn btn-primary" disabled="@_busy">
+                                @(_busy ? "Scheduling…" : "Launch campaign")
+                            </button>
+                        </div>
+                    </EditForm>
+                }
+                else
+                {
+                    <p class="muted">Choose a venue, set a simple budget, and CrewHop will place the ad in front of guests who match your audience.</p>
+                    <button class="btn btn-accent" style="margin-top:1rem;" @onclick="() => _showForm = true">Start a campaign</button>
+                }
+            </section>
+
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>How ads are performing</h2>
+                </div>
+                <div class="grid grid-3" style="margin-bottom:1rem;">
+                    <div class="metric">
+                        <div class="label">Impressions</div>
+                        <div class="value">@_impressions.ToString("N0")</div>
+                    </div>
+                    <div class="metric">
+                        <div class="label">Clicks</div>
+                        <div class="value">@_clicks.ToString("N0")</div>
+                    </div>
+                    <div class="metric">
+                        <div class="label">Bookings</div>
+                        <div class="value">@_bookings.ToString("N0")</div>
+                    </div>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Campaign</th>
+                            <th>Status</th>
+                            <th>Budget</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var campaign in Store.Campaigns.Take(5))
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@campaign.Name</strong>
+                                    <div class="muted" style="font-size:0.8rem;">@(Store.GetVenue(campaign.VenueId)?.Name)</div>
+                                </td>
+                                <td><StatusBadge Status="@campaign.Status" /></td>
+                                <td>€@campaign.Budget.ToString("0")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </section>
+        </div>
+
+        <div class="grid grid-2" style="margin-top:1rem;">
+            @foreach (var campaign in Store.Campaigns)
+            {
+                var venue = Store.GetVenue(campaign.VenueId);
+                var ctr = campaign.Impressions == 0 ? 0 : (double)campaign.Clicks / campaign.Impressions * 100;
+                <article class="campaign-card">
+                    <div class="card-top">
+                        <div>
+                            <h3>@campaign.Name</h3>
+                            <div class="muted" style="font-size:0.86rem;">@(venue?.Name ?? "Venue") · @campaign.Objective</div>
+                        </div>
+                        <StatusBadge Status="@campaign.Status" />
+                    </div>
+                    <div class="muted" style="font-size:0.86rem;">
+                        Audience: @campaign.Audience<br />
+                        @campaign.StartDate.ToString("dd MMM") – @campaign.EndDate.ToString("dd MMM yyyy") · Budget €@campaign.Budget.ToString("0")
+                    </div>
+                    <div class="metric-row">
+                        <div class="metric">
+                            <div class="label">Impressions</div>
+                            <div class="value">@campaign.Impressions.ToString("N0")</div>
+                        </div>
+                        <div class="metric">
+                            <div class="label">Clicks</div>
+                            <div class="value">@campaign.Clicks.ToString("N0")</div>
+                        </div>
+                        <div class="metric">
+                            <div class="label">Bookings</div>
+                            <div class="value">@campaign.Bookings.ToString("N0")</div>
+                        </div>
+                    </div>
+                    <div class="muted" style="font-size:0.8rem;">CTR @ctr.ToString("0.00")%</div>
+                    <div class="card-actions">
+                        @if (campaign.Status is "Running" or "Scheduled")
+                        {
+                            <button type="button" class="btn btn-ghost btn-sm" @onclick='() => SetStatusAsync(campaign.Id, "Paused")'>Pause</button>
+                            <button type="button" class="btn btn-secondary btn-sm" @onclick='() => SetStatusAsync(campaign.Id, "Ended")'>Stop</button>
+                        }
+                        else if (campaign.Status == "Paused")
+                        {
+                            <button type="button" class="btn btn-primary btn-sm" @onclick='() => SetStatusAsync(campaign.Id, "Running")'>Resume</button>
+                            <button type="button" class="btn btn-secondary btn-sm" @onclick='() => SetStatusAsync(campaign.Id, "Ended")'>Stop</button>
+                        }
+                        else if (campaign.Status == "Ended")
+                        {
+                            <button type="button" class="btn btn-primary btn-sm" @onclick='() => SetStatusAsync(campaign.Id, "Running")'>Restart</button>
+                        }
+                        <button type="button" class="btn btn-danger btn-sm" @onclick="() => RemoveAsync(campaign.Id)">Remove</button>
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private bool _ready;
+    private bool _showForm = true;
+    private bool _busy;
+    private string _error = "";
+    private string _success = "";
+    private CreateCampaignRequest _form = new();
+    private int _impressions;
+    private int _clicks;
+    private int _bookings;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Store.Changed += OnChanged;
+
+        await Store.EnsureLoadedAsync();
+        PrefillVenueFromQuery();
+        RefreshStats();
+        _ready = true;
+    }
+
+    private void PrefillVenueFromQuery()
+    {
+        var venueId = QueryString.Get(Nav.Uri, "venue");
+        if (!string.IsNullOrWhiteSpace(venueId))
+        {
+            _form.VenueId = venueId;
+            _showForm = true;
+        }
+        else if (Store.Venues.Count > 0)
+        {
+            _form.VenueId = Store.Venues[0].Id;
+        }
+    }
+
+    private void OnChanged()
+    {
+        RefreshStats();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void RefreshStats()
+    {
+        _impressions = Store.Campaigns.Sum(c => c.Impressions);
+        _clicks = Store.Campaigns.Sum(c => c.Clicks);
+        _bookings = Store.Campaigns.Sum(c => c.Bookings);
+    }
+
+    private async Task CreateAsync()
+    {
+        _error = "";
+        _success = "";
+
+        if (string.IsNullOrWhiteSpace(_form.VenueId) || string.IsNullOrWhiteSpace(_form.Name))
+        {
+            _error = "Choose a venue and give the campaign a clear name.";
+            return;
+        }
+
+        if (_form.Budget <= 0)
+        {
+            _error = "Enter a budget greater than zero.";
+            return;
+        }
+
+        if (_form.EndDate < _form.StartDate)
+        {
+            _error = "The end date needs to be on or after the start date.";
+            return;
+        }
+
+        _busy = true;
+        await Store.AddCampaignAsync(_form);
+        _busy = false;
+        _success = $"“{_form.Name}” is scheduled for {(Store.GetVenue(_form.VenueId)?.Name ?? "your venue")}.";
+        _form = new CreateCampaignRequest
+        {
+            VenueId = Store.Venues.FirstOrDefault()?.Id ?? ""
+        };
+    }
+
+    private Task SetStatusAsync(string id, string status) => Store.SetCampaignStatusAsync(id, status);
+
+    private Task RemoveAsync(string id) => Store.RemoveCampaignAsync(id);
+
+    public void Dispose() => Store.Changed -= OnChanged;
+}
