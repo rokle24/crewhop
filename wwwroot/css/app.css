@@ -167,6 +167,7 @@ p {
   height: auto;
   max-width: none;
   display: block;
+  background: #fff;
 }
 
 .brand-lockup .logo-sm {
