@@ -7,16 +7,32 @@
 
 <div class="login-screen">
     <section class="login-visual" aria-hidden="false">
-        <div class="login-brand">
-            <div class="login-brand-plate login-brand-plate--ninetyfive">
-                <img src="images/crewhop-logo-full.png?v=16" alt="CrewHop" />
+        <div class="login-visual-grain" aria-hidden="true"></div>
+        <div class="login-visual-motif" aria-hidden="true">
+            <svg viewBox="0 0 420 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="210" cy="168" r="92" stroke="currentColor" stroke-width="1.25" opacity="0.35" />
+                <path d="M210 88c-44 0-80 36-80 80 0 56 80 144 80 144s80-88 80-144c0-44-36-80-80-80z" stroke="currentColor" stroke-width="1.25" opacity="0.45" />
+                <circle cx="186" cy="158" r="10" fill="currentColor" opacity="0.28" />
+                <circle cx="210" cy="148" r="12" fill="currentColor" opacity="0.36" />
+                <circle cx="234" cy="158" r="10" fill="currentColor" opacity="0.28" />
+                <path d="M72 312c28-22 58-34 92-34s64 12 92 34" stroke="currentColor" stroke-width="1.25" opacity="0.3" stroke-linecap="round" />
+                <path d="M108 338c22-14 44-22 68-22s46 8 68 22" stroke="currentColor" stroke-width="1.1" opacity="0.22" stroke-linecap="round" />
+            </svg>
+        </div>
+
+        <div class="login-visual-stack">
+            <div class="login-brand">
+                <div class="login-brand-plate login-brand-plate--ninetyfive">
+                    <img src="images/crewhop-logo-full.png?v=17" alt="CrewHop" />
+                </div>
+            </div>
+            <div class="login-quote">
+                <h1>Run your venues with the same calm clarity as the CrewHop app.</h1>
+                <p>Check performance, launch promotions, and book ad space — built for busy operators.</p>
             </div>
         </div>
-        <div class="login-quote">
-            <h1>Run your venues with the same calm clarity as the CrewHop app.</h1>
-            <p>Check performance, launch promotions, and book ad space — built for busy operators.</p>
-        </div>
-        <p style="opacity:0.8;font-size:0.9rem;">Business portal</p>
+
+        <div class="login-portal-badge">Business portal</div>
     </section>
 
     <section class="login-panel">
@@ -25,11 +41,11 @@
             <p class="lede">Use your email to open venues, promotions, and campaign stats.</p>
 
             <EditForm Model="_model" OnValidSubmit="HandleContinueAsync">
-                <div class="field" style="margin-bottom:0.85rem;">
+                <div class="field login-field">
                     <label for="email">Email</label>
                     <InputText id="email" @bind-Value="_model.Email" placeholder="demo@crewhop.com" autocomplete="username" />
                 </div>
-                <div class="field" style="margin-bottom:1rem;">
+                <div class="field login-field">
                     <label for="password">Password</label>
                     <InputText id="password" type="password" @bind-Value="_model.Password" placeholder="••••••••" autocomplete="current-password" />
                 </div>
@@ -39,9 +55,10 @@
                     <div class="alert alert-error" style="margin-bottom:0.9rem;">@_error</div>
                 }
 
-                <button class="btn btn-primary" style="width:100%;" type="submit" disabled="@_busy">
+                <button class="btn btn-primary login-submit" type="submit" disabled="@_busy">
                     @(_busy ? "Opening…" : "Sign in")
                 </button>
+                <button type="button" class="login-forgot">Forgot password?</button>
             </EditForm>
         </div>
     </section>

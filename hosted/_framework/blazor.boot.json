@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "CrewHop.Portal",
   "resources": {
-    "hash": "sha256-y5k+uQorKdR5ouVR46670pN3iPNDmZqny9N96kVryxQ=",
+    "hash": "sha256-Szh0be3/j/0vEylAhwIlJf4+ZX7q/52ot8FZ3SloHAY=",
     "jsModuleNative": {
       "dotnet.native.8.0.34.9arczohsxh.js": "sha256-Uc+HxggmSGuU1CkPjbVFhBiqRQ6cUsH1lnQ1keONjkE="
     },
@@ -17,7 +17,7 @@
       "icudt_no_CJK.dat": "sha256-L7sV7NEYP37/Qr2FPCePo5cJqRgTXRwGHuwF5Q+0Nfs="
     },
     "assembly": {
-      "CrewHop.Portal.wasm": "sha256-3WnAQPzfZrf7V7h5tU5bvadMn6Yhc30aGcR5C8yxfUQ=",
+      "CrewHop.Portal.wasm": "sha256-brvRR7J5DKjOX3VyhYADo7vFR1wTJtEkfRSXU0HF6jY=",
       "Microsoft.AspNetCore.Components.Forms.wasm": "sha256-6ADCXSgO11gJk3ozvdH2FqtjTy0Bu6JWbGoxVzzyUks=",
       "Microsoft.AspNetCore.Components.wasm": "sha256-iGAIV9MIbRNux+WqMRT+LCxm6XfUKSpQnZVSgVv7N2s=",
       "Microsoft.AspNetCore.Components.Web.wasm": "sha256-ItlBEA2pFxA6vWqyGHFTRSZwjc4/t0J7bkVIxmMRbB4=",
