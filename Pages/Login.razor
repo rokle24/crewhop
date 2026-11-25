@@ -8,8 +8,8 @@
 <div class="login-screen">
     <section class="login-visual" aria-hidden="false">
         <div class="login-brand">
-            <div class="login-logo-frame @_plateClass">
-                <img src="images/crewhop-logo-full.png?v=13" alt="CrewHop" />
+            <div class="login-brand-plate @_plateClass">
+                <img src="images/crewhop-logo-full.png?v=14" alt="CrewHop" />
             </div>
         </div>
         <div class="login-quote">
@@ -64,8 +64,8 @@
     private bool _busy;
 
     private string _plateClass => _logoDraft == LogoDraft.Full
-        ? "login-logo-frame--full"
-        : "login-logo-frame--ninety";
+        ? "login-brand-plate--full"
+        : "login-brand-plate--ninety";
 
     private void SetDraft(LogoDraft draft) => _logoDraft = draft;
 
