@@ -19,7 +19,7 @@ else
     <div class="shell">
         <aside class="sidebar">
             <div class="brand-lockup">
-                <img class="logo" src="images/crewhop-logo-full.png?v=14" alt="CrewHop" />
+                <img class="logo" src="images/crewhop-logo-full.png?v=15" alt="CrewHop" />
                 <span class="brand-tag">Business portal</span>
             </div>
 
@@ -48,7 +48,7 @@ else
         <div class="main-panel">
             <div class="mobile-top">
                 <div class="brand-lockup">
-                    <img class="logo logo-sm" src="images/crewhop-logo-full.png?v=14" alt="CrewHop" />
+                    <img class="logo logo-sm" src="images/crewhop-logo-full.png?v=15" alt="CrewHop" />
                 </div>
                 <button class="btn btn-ghost btn-sm" @onclick="ExitAsync">Sign out</button>
             </div>
@@ -114,7 +114,7 @@ else
     {
         await Profile.ClearAsync();
         RefreshProfileLabels();
-        Nav.NavigateTo("/");
+        Nav.NavigateTo("https://rokle24.github.io/crewhop/", forceLoad: true);
     }
 
     public void Dispose() => Nav.LocationChanged -= OnLocationChanged;

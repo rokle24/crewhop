@@ -8,18 +8,13 @@
 <div class="login-screen">
     <section class="login-visual" aria-hidden="false">
         <div class="login-brand">
-            <div class="login-brand-plate @_plateClass">
-                <img src="images/crewhop-logo-full.png?v=14" alt="CrewHop" />
+            <div class="login-brand-plate login-brand-plate--ninetyfive">
+                <img src="images/crewhop-logo-full.png?v=15" alt="CrewHop" />
             </div>
         </div>
         <div class="login-quote">
             <h1>Run your venues with the same calm clarity as the CrewHop app.</h1>
             <p>Check performance, launch promotions, and book ad space — built for busy operators.</p>
-        </div>
-        <div class="login-draft-switch" role="group" aria-label="Logo draft">
-            <span>Logo draft</span>
-            <button type="button" class="btn btn-ghost btn-sm @(_logoDraft == LogoDraft.Full ? "is-active" : null)" @onclick='() => SetDraft(LogoDraft.Full)'>100% width</button>
-            <button type="button" class="btn btn-ghost btn-sm @(_logoDraft == LogoDraft.Ninety ? "is-active" : null)" @onclick='() => SetDraft(LogoDraft.Ninety)'>90% width</button>
         </div>
         <p style="opacity:0.8;font-size:0.9rem;">Business portal</p>
     </section>
@@ -53,21 +48,12 @@
 </div>
 
 @code {
-    private enum LogoDraft { Full, Ninety }
-
-    private LogoDraft _logoDraft = LogoDraft.Full;
     private readonly EntryModel _model = new()
     {
         Email = OperatorProfile.DemoEmail
     };
     private string _error = "";
     private bool _busy;
-
-    private string _plateClass => _logoDraft == LogoDraft.Full
-        ? "login-brand-plate--full"
-        : "login-brand-plate--ninety";
-
-    private void SetDraft(LogoDraft draft) => _logoDraft = draft;
 
     private async Task HandleContinueAsync()
     {
