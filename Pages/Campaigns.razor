@@ -192,7 +192,14 @@ else
                         {
                             <button type="button" class="btn btn-primary btn-sm" @onclick='() => SetStatusAsync(campaign.Id, "Running")'>Restart</button>
                         }
-                        <button type="button" class="btn btn-danger btn-sm" @onclick="() => RemoveAsync(campaign.Id)">Remove</button>
+                        @{
+                            var canRemove = Store.CanRemoveCampaign(campaign);
+                        }
+                        <button type="button"
+                                class="btn btn-danger btn-sm"
+                                title="@(canRemove ? "Remove campaign" : "Only campaigns with no impressions, clicks, or bookings can be removed")"
+                                disabled="@(!canRemove)"
+                                @onclick="() => AskRemove(campaign)">Remove</button>
                     </div>
                 </article>
             }
@@ -200,10 +207,20 @@ else
     </div>
 }
 
+<ConfirmDialog Open="_confirmOpen"
+               Title="Remove this campaign?"
+               Message="@_confirmMessage"
+               ConfirmLabel="Remove campaign"
+               OnConfirm="ConfirmRemoveAsync"
+               OnCancel="CancelRemove" />
+
 @code {
     private bool _ready;
     private bool _showForm = true;
     private bool _busy;
+    private bool _confirmOpen;
+    private string _confirmMessage = "";
+    private string? _pendingRemoveId;
     private string _error = "";
     private string _success = "";
     private CreateCampaignRequest _form = new();
@@ -283,7 +300,34 @@ else
 
     private Task SetStatusAsync(string id, string status) => Store.SetCampaignStatusAsync(id, status);
 
-    private Task RemoveAsync(string id) => Store.RemoveCampaignAsync(id);
+    private void AskRemove(Campaign campaign)
+    {
+        if (!Store.CanRemoveCampaign(campaign))
+        {
+            return;
+        }
+
+        _pendingRemoveId = campaign.Id;
+        _confirmMessage = $"Remove “{campaign.Name}”? Only campaigns without activity can be deleted.";
+        _confirmOpen = true;
+    }
+
+    private void CancelRemove()
+    {
+        _confirmOpen = false;
+        _pendingRemoveId = null;
+    }
+
+    private async Task ConfirmRemoveAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(_pendingRemoveId))
+        {
+            await Store.RemoveCampaignAsync(_pendingRemoveId);
+        }
+
+        _confirmOpen = false;
+        _pendingRemoveId = null;
+    }
 
     public void Dispose() => Store.Changed -= OnChanged;
 }

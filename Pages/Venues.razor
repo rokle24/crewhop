@@ -32,6 +32,7 @@ else
                 {
                     var promos = Store.PromotionsForVenue(venue.Id).Count(p => p.Status == "Running");
                     var campaigns = Store.CampaignsForVenue(venue.Id).Count();
+                    var canRemove = Store.CanRemoveVenue(venue.Id);
                     <article class="venue-card">
                         <div class="venue-visual @venue.ImageTone">
                             @if (!string.IsNullOrWhiteSpace(venue.ImageUrl))
@@ -80,7 +81,11 @@ else
                                 {
                                     <button type="button" class="btn btn-secondary btn-sm" @onclick='() => SetStatusAsync(venue.Id, "Active")'>Activate</button>
                                 }
-                                <button type="button" class="btn btn-danger btn-sm" @onclick="() => AskRemove(venue)">Remove</button>
+                                <button type="button"
+                                        class="btn btn-danger btn-sm"
+                                        title="@(canRemove ? "Remove venue" : "Only venues with no promotions or campaigns can be removed")"
+                                        disabled="@(!canRemove)"
+                                        @onclick="() => AskRemove(venue)">Remove</button>
                             </div>
                         </div>
                     </article>
@@ -116,8 +121,13 @@ else
 
     private void AskRemove(Venue venue)
     {
+        if (!Store.CanRemoveVenue(venue.Id))
+        {
+            return;
+        }
+
         _pendingRemoveId = venue.Id;
-        _confirmMessage = $"Remove “{venue.Name}”? Its promotions and campaigns will be removed too. This cannot be undone.";
+        _confirmMessage = $"Remove “{venue.Name}”? Only empty venues can be deleted. This cannot be undone.";
         _confirmOpen = true;
     }
 

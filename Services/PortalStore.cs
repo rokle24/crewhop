@@ -50,8 +50,7 @@ public sealed class PortalStore
                     _data = parsed;
                     var changed = EnsureDemoBusiness()
                                   | EnsureVenueImages()
-                                  | EnsureSignaturePromos()
-                                  | EnrichZeroStatPromotions();
+                                  | EnsureSignaturePromos();
                     if (changed)
                     {
                         await PersistAsync();
@@ -73,7 +72,6 @@ public sealed class PortalStore
         EnsureDemoBusiness();
         EnsureVenueImages();
         EnsureSignaturePromos();
-        EnrichZeroStatPromotions();
         _loaded = true;
         await PersistAsync();
     }
@@ -98,10 +96,10 @@ public sealed class PortalStore
 
     private static readonly Dictionary<string, string> DefaultVenueImages = new()
     {
-        ["venue-oak-room"] = "images/venues/cafe.svg",
-        ["venue-blue-harbor"] = "images/venues/barbershop.svg",
-        ["venue-nightingale"] = "images/venues/bar.svg",
-        ["venue-riverside"] = "images/venues/terrace.svg"
+        ["venue-oak-room"] = "images/venues/cafe.jpg",
+        ["venue-blue-harbor"] = "images/venues/barbershop.jpg",
+        ["venue-nightingale"] = "images/venues/bar.jpg",
+        ["venue-riverside"] = "images/venues/terrace.jpg"
     };
 
     private bool EnsureVenueImages()
@@ -114,29 +112,41 @@ public sealed class PortalStore
         {
             blue.Name = "Blue Harbor Barber";
             blue.Category = "Barbershop";
-            if (!blue.ImageUrl.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
-            {
-                blue.ImageUrl = "images/venues/barbershop.svg";
-            }
-
             changed = true;
         }
 
         foreach (var venue in _data.Venues)
         {
-            if (!string.IsNullOrWhiteSpace(venue.ImageUrl))
+            if (venue.ImageUrl.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
             {
                 continue;
             }
 
-            venue.ImageUrl = DefaultVenueImages.TryGetValue(venue.Id, out var path)
+            var fallback = DefaultVenueImages.TryGetValue(venue.Id, out var path)
                 ? path
-                : "images/venues/cafe.svg";
-            changed = true;
+                : "images/venues/cafe.jpg";
+
+            if (string.IsNullOrWhiteSpace(venue.ImageUrl)
+                || venue.ImageUrl.EndsWith(".svg", StringComparison.OrdinalIgnoreCase)
+                || (venue.ImageUrl.StartsWith("images/venues/", StringComparison.OrdinalIgnoreCase)
+                    && !venue.ImageUrl.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase)))
+            {
+                venue.ImageUrl = fallback;
+                changed = true;
+            }
         }
 
         return changed;
     }
+
+    public bool CanRemoveVenue(string id) =>
+        !PromotionsForVenue(id).Any() && !CampaignsForVenue(id).Any();
+
+    public bool CanRemovePromotion(Promotion promo) =>
+        promo.Views <= 0 && promo.Redemptions <= 0;
+
+    public bool CanRemoveCampaign(Campaign campaign) =>
+        campaign.Impressions <= 0 && campaign.Clicks <= 0 && campaign.Bookings <= 0;
 
     private bool EnsureSignaturePromos()
     {
@@ -198,26 +208,6 @@ public sealed class PortalStore
         Changed?.Invoke();
     }
 
-    private bool EnrichZeroStatPromotions()
-    {
-        var changed = false;
-        foreach (var promo in _data.Promotions.Where(p => p.Views <= 0 && p.Redemptions <= 0))
-        {
-            ApplyLaunchStats(promo);
-            changed = true;
-        }
-
-        return changed;
-    }
-
-    private static void ApplyLaunchStats(Promotion promo)
-    {
-        var seed = Math.Abs(HashCode.Combine(promo.Id, promo.Title));
-        promo.Views = 800 + seed % 4200;
-        promo.Redemptions = Math.Max(12, promo.Views / (8 + seed % 7));
-        promo.Spend = 35 + seed % 160;
-    }
-
     public Venue? GetVenue(string id) => _data.Venues.FirstOrDefault(v => v.Id == id);
 
     public IEnumerable<Promotion> PromotionsForVenue(string venueId) =>
@@ -242,7 +232,6 @@ public sealed class PortalStore
             Redemptions = 0,
             Spend = 0
         };
-        ApplyLaunchStats(promo);
 
         _data.Promotions.Insert(0, promo);
         await PersistAsync();
@@ -287,6 +276,12 @@ public sealed class PortalStore
 
     public async Task RemovePromotionAsync(string id)
     {
+        var promo = _data.Promotions.FirstOrDefault(p => p.Id == id);
+        if (promo is null || !CanRemovePromotion(promo))
+        {
+            return;
+        }
+
         _data.Promotions.RemoveAll(p => p.Id == id);
         await PersistAsync();
         Changed?.Invoke();
@@ -307,6 +302,12 @@ public sealed class PortalStore
 
     public async Task RemoveCampaignAsync(string id)
     {
+        var campaign = _data.Campaigns.FirstOrDefault(c => c.Id == id);
+        if (campaign is null || !CanRemoveCampaign(campaign))
+        {
+            return;
+        }
+
         _data.Campaigns.RemoveAll(c => c.Id == id);
         await PersistAsync();
         Changed?.Invoke();
@@ -327,6 +328,11 @@ public sealed class PortalStore
 
     public async Task RemoveVenueAsync(string id)
     {
+        if (!CanRemoveVenue(id))
+        {
+            return;
+        }
+
         _data.Venues.RemoveAll(v => v.Id == id);
         _data.Promotions.RemoveAll(p => p.VenueId == id);
         _data.Campaigns.RemoveAll(c => c.VenueId == id);

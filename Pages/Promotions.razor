@@ -150,7 +150,14 @@ else
                         {
                             <button type="button" class="btn btn-primary btn-sm" @onclick='() => SetStatusAsync(promo.Id, "Running")'>Restart</button>
                         }
-                        <button type="button" class="btn btn-danger btn-sm" @onclick="() => RemoveAsync(promo.Id)">Remove</button>
+                        @{
+                            var canRemove = Store.CanRemovePromotion(promo);
+                        }
+                        <button type="button"
+                                class="btn btn-danger btn-sm"
+                                title="@(canRemove ? "Remove promotion" : "Only promotions with no views or redemptions can be removed")"
+                                disabled="@(!canRemove)"
+                                @onclick="() => AskRemove(promo)">Remove</button>
                     </div>
                 </article>
             }
@@ -158,10 +165,20 @@ else
     </div>
 }
 
+<ConfirmDialog Open="_confirmOpen"
+               Title="Remove this promotion?"
+               Message="@_confirmMessage"
+               ConfirmLabel="Remove promotion"
+               OnConfirm="ConfirmRemoveAsync"
+               OnCancel="CancelRemove" />
+
 @code {
     private bool _ready;
     private bool _showForm;
     private bool _busy;
+    private bool _confirmOpen;
+    private string _confirmMessage = "";
+    private string? _pendingRemoveId;
     private string _error = "";
     private string _success = "";
     private CreatePromotionRequest _form = new();
@@ -242,7 +259,34 @@ else
 
     private Task SetStatusAsync(string id, string status) => Store.SetPromotionStatusAsync(id, status);
 
-    private Task RemoveAsync(string id) => Store.RemovePromotionAsync(id);
+    private void AskRemove(Promotion promo)
+    {
+        if (!Store.CanRemovePromotion(promo))
+        {
+            return;
+        }
+
+        _pendingRemoveId = promo.Id;
+        _confirmMessage = $"Remove “{promo.Title}”? Only promotions without activity can be deleted.";
+        _confirmOpen = true;
+    }
+
+    private void CancelRemove()
+    {
+        _confirmOpen = false;
+        _pendingRemoveId = null;
+    }
+
+    private async Task ConfirmRemoveAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(_pendingRemoveId))
+        {
+            await Store.RemovePromotionAsync(_pendingRemoveId);
+        }
+
+        _confirmOpen = false;
+        _pendingRemoveId = null;
+    }
 
     public void Dispose() => Store.Changed -= OnChanged;
 }

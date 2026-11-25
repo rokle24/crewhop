@@ -16,7 +16,7 @@
       "weeklyVisitors": 1840,
       "rating": 4.7,
       "imageTone": "forest",
-      "imageUrl": "images/venues/cafe.svg"
+      "imageUrl": "images/venues/cafe.jpg"
     },
     {
       "id": "venue-blue-harbor",
@@ -28,7 +28,7 @@
       "weeklyVisitors": 2210,
       "rating": 4.5,
       "imageTone": "blue",
-      "imageUrl": "images/venues/barbershop.svg"
+      "imageUrl": "images/venues/barbershop.jpg"
     },
     {
       "id": "venue-nightingale",
@@ -40,7 +40,7 @@
       "weeklyVisitors": 1560,
       "rating": 4.8,
       "imageTone": "sand",
-      "imageUrl": "images/venues/bar.svg"
+      "imageUrl": "images/venues/bar.jpg"
     },
     {
       "id": "venue-riverside",
@@ -52,7 +52,7 @@
       "weeklyVisitors": 980,
       "rating": 4.6,
       "imageTone": "mist",
-      "imageUrl": "images/venues/terrace.svg"
+      "imageUrl": "images/venues/terrace.jpg"
     }
   ],
   "promotions": [

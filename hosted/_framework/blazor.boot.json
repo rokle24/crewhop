@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "CrewHop.Portal",
   "resources": {
-    "hash": "sha256-Ykipd7HNMMen4vr6khZlur9saL7XLHRB9giRlwtU/Oo=",
+    "hash": "sha256-MP/ig1ZVfdiji1dPKAIT3zxrZ4oIeIag2z6r+GdxUb8=",
     "jsModuleNative": {
       "dotnet.native.8.0.34.9arczohsxh.js": "sha256-Uc+HxggmSGuU1CkPjbVFhBiqRQ6cUsH1lnQ1keONjkE="
     },
@@ -17,7 +17,7 @@
       "icudt_no_CJK.dat": "sha256-L7sV7NEYP37/Qr2FPCePo5cJqRgTXRwGHuwF5Q+0Nfs="
     },
     "assembly": {
-      "CrewHop.Portal.wasm": "sha256-dUnpkt4tCL6HxzS3WC+iqP7H6uRSRwnoYJRl68sEYKE=",
+      "CrewHop.Portal.wasm": "sha256-qeJsYUcn/+V9o5a/9vtjZtcVoatZvNP1Z3GvOkGjtxA=",
       "Microsoft.AspNetCore.Components.Forms.wasm": "sha256-6ADCXSgO11gJk3ozvdH2FqtjTy0Bu6JWbGoxVzzyUks=",
       "Microsoft.AspNetCore.Components.wasm": "sha256-iGAIV9MIbRNux+WqMRT+LCxm6XfUKSpQnZVSgVv7N2s=",
       "Microsoft.AspNetCore.Components.Web.wasm": "sha256-ItlBEA2pFxA6vWqyGHFTRSZwjc4/t0J7bkVIxmMRbB4=",
@@ -53,7 +53,7 @@
       "System.Private.Uri.wasm": "sha256-o8WCGYrWoBh3VcQUJI5rOoryi4/z/eq4j88B/y72uqk=",
       "System.Runtime.InteropServices.JavaScript.wasm": "sha256-MB3Cr+WbvNXxLiW9cFHtgEtfdFq+2qMLel9i5gLiCpk=",
       "System.Runtime.Serialization.Primitives.wasm": "sha256-VwuX6B3NmK22dlEp4WRQX2cxck7o+mG/uyePgsCm7Jo=",
-      "System.Runtime.wasm": "sha256-qFg3n2SjYoh1ASQQPfHMSUimC/dUjPrl2trXEOX6/EE=",
+      "System.Runtime.wasm": "sha256-4f75VB4dfwgN41jad9w4d8ZMS8u2RVxsArYuDEoig8o=",
       "System.Text.Encodings.Web.wasm": "sha256-hYGsWIBoI7enZuon+uIduBZKYMC5GAC/kGBuDDjPIdU=",
       "System.Text.Json.wasm": "sha256-GRu0zQ+eJHManAElsyzDsh1ujGYuwrOGQMEk7iSG6X8=",
       "System.Text.RegularExpressions.wasm": "sha256-Y6J7H1Bl1e/pevu9pTUPUUjoJJ4jsJpP48paEo4vPDY=",
