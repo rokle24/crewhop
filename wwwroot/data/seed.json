@@ -2,8 +2,8 @@
   "business": {
     "id": "biz-harbor-vine",
     "name": "Harbor & Vine Hospitality",
-    "contactEmail": "maya@harborvine.com",
-    "ownerName": "Maya Ortega"
+    "contactEmail": "demo@crewhop.com",
+    "ownerName": "Demo User"
   },
   "venues": [
     {
@@ -15,18 +15,20 @@
       "status": "Active",
       "weeklyVisitors": 1840,
       "rating": 4.7,
-      "imageTone": "forest"
+      "imageTone": "forest",
+      "imageUrl": "images/venues/cafe.svg"
     },
     {
       "id": "venue-blue-harbor",
-      "name": "Blue Harbor Café",
-      "category": "Café",
+      "name": "Blue Harbor Barber",
+      "category": "Barbershop",
       "address": "4 Klostergade",
       "city": "Aarhus",
       "status": "Active",
       "weeklyVisitors": 2210,
       "rating": 4.5,
-      "imageTone": "blue"
+      "imageTone": "blue",
+      "imageUrl": "images/venues/barbershop.svg"
     },
     {
       "id": "venue-nightingale",
@@ -37,7 +39,8 @@
       "status": "Active",
       "weeklyVisitors": 1560,
       "rating": 4.8,
-      "imageTone": "sand"
+      "imageTone": "sand",
+      "imageUrl": "images/venues/bar.svg"
     },
     {
       "id": "venue-riverside",
@@ -48,19 +51,20 @@
       "status": "Seasonal",
       "weeklyVisitors": 980,
       "rating": 4.6,
-      "imageTone": "mist"
+      "imageTone": "mist",
+      "imageUrl": "images/venues/terrace.svg"
     }
   ],
   "promotions": [
     {
-      "id": "promo-potato",
-      "venueId": "venue-oak-room",
-      "title": "Potato",
-      "description": "Pay twice, get nothing",
+      "id": "promo-student-night",
+      "venueId": "venue-nightingale",
+      "title": "Student Night",
+      "description": "Show a student ID after 8pm for a free soft drink with any main.",
       "status": "Running",
       "startDate": "2026-11-21",
       "endDate": "2026-12-31",
-      "discountLabel": "-200% off",
+      "discountLabel": "Free drink",
       "views": 2840,
       "redemptions": 317,
       "spend": 88
@@ -149,9 +153,9 @@
     {
       "id": "camp-harbor-lunch",
       "venueId": "venue-blue-harbor",
-      "name": "Café Lunch Boost",
+      "name": "Barber Lunch Boost",
       "objective": "Increase foot traffic",
-      "audience": "Office workers nearby",
+      "audience": "Students nearby",
       "budget": 280,
       "status": "Running",
       "startDate": "2026-11-08",

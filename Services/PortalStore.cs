@@ -48,7 +48,10 @@ public sealed class PortalStore
                 if (parsed is not null)
                 {
                     _data = parsed;
-                    var changed = EnsureSignaturePromos() | EnrichZeroStatPromotions();
+                    var changed = EnsureDemoBusiness()
+                                  | EnsureVenueImages()
+                                  | EnsureSignaturePromos()
+                                  | EnrichZeroStatPromotions();
                     if (changed)
                     {
                         await PersistAsync();
@@ -67,55 +70,132 @@ public sealed class PortalStore
         var seed = await _http.GetFromJsonAsync<PortalData>("data/seed.json", JsonOptions)
                    ?? throw new InvalidOperationException("Could not load portal data.");
         _data = seed;
+        EnsureDemoBusiness();
+        EnsureVenueImages();
         EnsureSignaturePromos();
         EnrichZeroStatPromotions();
         _loaded = true;
         await PersistAsync();
     }
 
+    private bool EnsureDemoBusiness()
+    {
+        var changed = false;
+        if (_data.Business.ContactEmail != "demo@crewhop.com")
+        {
+            _data.Business.ContactEmail = "demo@crewhop.com";
+            changed = true;
+        }
+
+        if (_data.Business.OwnerName != "Demo User")
+        {
+            _data.Business.OwnerName = "Demo User";
+            changed = true;
+        }
+
+        return changed;
+    }
+
+    private static readonly Dictionary<string, string> DefaultVenueImages = new()
+    {
+        ["venue-oak-room"] = "images/venues/cafe.svg",
+        ["venue-blue-harbor"] = "images/venues/barbershop.svg",
+        ["venue-nightingale"] = "images/venues/bar.svg",
+        ["venue-riverside"] = "images/venues/terrace.svg"
+    };
+
+    private bool EnsureVenueImages()
+    {
+        var changed = false;
+        var blue = _data.Venues.FirstOrDefault(v => v.Id == "venue-blue-harbor");
+        if (blue is not null
+            && (blue.Name.Contains("Café", StringComparison.OrdinalIgnoreCase)
+                || blue.Category.Equals("Café", StringComparison.OrdinalIgnoreCase)))
+        {
+            blue.Name = "Blue Harbor Barber";
+            blue.Category = "Barbershop";
+            if (!blue.ImageUrl.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
+            {
+                blue.ImageUrl = "images/venues/barbershop.svg";
+            }
+
+            changed = true;
+        }
+
+        foreach (var venue in _data.Venues)
+        {
+            if (!string.IsNullOrWhiteSpace(venue.ImageUrl))
+            {
+                continue;
+            }
+
+            venue.ImageUrl = DefaultVenueImages.TryGetValue(venue.Id, out var path)
+                ? path
+                : "images/venues/cafe.svg";
+            changed = true;
+        }
+
+        return changed;
+    }
+
     private bool EnsureSignaturePromos()
     {
+        var changed = false;
         var potato = _data.Promotions.FirstOrDefault(p =>
-            p.Title.Equals("Potato", StringComparison.OrdinalIgnoreCase));
+            p.Title.Equals("Potato", StringComparison.OrdinalIgnoreCase)
+            || p.Id == "promo-potato");
 
-        if (potato is null)
+        if (potato is not null)
+        {
+            potato.Id = "promo-student-night";
+            potato.VenueId = "venue-nightingale";
+            potato.Title = "Student Night";
+            potato.Description = "Show a student ID after 8pm for a free soft drink with any main.";
+            potato.DiscountLabel = "Free drink";
+            potato.Status = "Running";
+            if (potato.Views <= 0)
+            {
+                potato.Views = 2840;
+                potato.Redemptions = 317;
+                potato.Spend = 88;
+            }
+
+            changed = true;
+        }
+        else if (!_data.Promotions.Any(p => p.Id == "promo-student-night"
+                                           || p.Title.Equals("Student Night", StringComparison.OrdinalIgnoreCase)))
         {
             _data.Promotions.Insert(0, new Promotion
             {
-                Id = "promo-potato",
-                VenueId = "venue-oak-room",
-                Title = "Potato",
-                Description = "Pay twice, get nothing",
+                Id = "promo-student-night",
+                VenueId = "venue-nightingale",
+                Title = "Student Night",
+                Description = "Show a student ID after 8pm for a free soft drink with any main.",
                 Status = "Running",
                 StartDate = new DateOnly(2026, 11, 21),
                 EndDate = new DateOnly(2026, 12, 31),
-                DiscountLabel = "-200% off",
+                DiscountLabel = "Free drink",
                 Views = 2840,
                 Redemptions = 317,
                 Spend = 88
             });
-            return true;
+            changed = true;
         }
 
-        if (potato.Views <= 0 && potato.Redemptions <= 0)
+        return changed;
+    }
+
+    public async Task UpdateVenueImageAsync(string id, string imageUrl)
+    {
+        var venue = _data.Venues.FirstOrDefault(v => v.Id == id);
+        if (venue is null || string.IsNullOrWhiteSpace(imageUrl))
         {
-            potato.Views = 2840;
-            potato.Redemptions = 317;
-            potato.Spend = 88;
-            if (string.IsNullOrWhiteSpace(potato.Description))
-            {
-                potato.Description = "Pay twice, get nothing";
-            }
-
-            if (string.IsNullOrWhiteSpace(potato.DiscountLabel))
-            {
-                potato.DiscountLabel = "-200% off";
-            }
-
-            return true;
+            return;
         }
 
-        return false;
+        venue.ImageUrl = imageUrl;
+        await PersistAsync();
+        Changed?.Invoke();
     }
 
     private bool EnrichZeroStatPromotions()

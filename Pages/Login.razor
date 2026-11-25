@@ -9,7 +9,7 @@
     <section class="login-visual" aria-hidden="false">
         <div class="login-brand">
             <div class="login-brand-plate">
-                <img src="images/crewhop-logo@2x.png" alt="CrewHop" />
+                <img src="images/crewhop-logo-full.png" alt="CrewHop" />
             </div>
         </div>
         <div class="login-quote">
@@ -21,16 +21,13 @@
 
     <section class="login-panel">
         <div class="login-card">
-            <div class="login-card-brand">
-                <img src="images/crewhop-logo.png" srcset="images/crewhop-logo.png 1x, images/crewhop-logo@2x.png 2x" alt="CrewHop" />
-            </div>
             <h2>Sign in to your business</h2>
-            <p class="lede">Use your work email to open venues, promotions, and campaign stats.</p>
+            <p class="lede">Use your email to open venues, promotions, and campaign stats.</p>
 
             <EditForm Model="_model" OnValidSubmit="HandleContinueAsync">
                 <div class="field" style="margin-bottom:0.85rem;">
-                    <label for="email">Work email</label>
-                    <InputText id="email" @bind-Value="_model.Email" placeholder="you@yourvenue.com" autocomplete="username" />
+                    <label for="email">Email</label>
+                    <InputText id="email" @bind-Value="_model.Email" placeholder="demo@crewhop.com" autocomplete="username" />
                 </div>
                 <div class="field" style="margin-bottom:1rem;">
                     <label for="password">Password</label>
@@ -51,7 +48,10 @@
 </div>
 
 @code {
-    private readonly EntryModel _model = new();
+    private readonly EntryModel _model = new()
+    {
+        Email = OperatorProfile.DemoEmail
+    };
     private string _error = "";
     private bool _busy;
 
@@ -59,22 +59,20 @@
     {
         _error = "";
         var email = _model.Email.Trim();
-        if (string.IsNullOrWhiteSpace(email) || !email.Contains('@'))
+        if (!email.Equals(OperatorProfile.DemoEmail, StringComparison.OrdinalIgnoreCase))
         {
-            _error = "Enter a work email to continue.";
+            _error = $"This demo portal only accepts {OperatorProfile.DemoEmail}.";
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(_model.Password))
+        if (!string.Equals(_model.Password, OperatorProfile.DemoPassword, StringComparison.Ordinal))
         {
-            _error = "Enter your password to continue.";
+            _error = "Incorrect password. Use the demo password.";
             return;
         }
 
         _busy = true;
-        var local = email.Split('@')[0].Replace('.', ' ').Replace('_', ' ').Replace('-', ' ');
-        var name = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(local);
-        await Profile.SetAsync(email, name);
+        await Profile.SetAsync(OperatorProfile.DemoEmail, OperatorProfile.DemoDisplayName);
         _busy = false;
         Nav.NavigateTo("dashboard");
     }

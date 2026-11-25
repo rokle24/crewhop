@@ -1,5 +1,6 @@
 @page "/venues"
 @inject PortalStore Store
+@inject IJSRuntime Js
 @implements IDisposable
 
 <PageTitle>Venues · CrewHop</PageTitle>
@@ -32,7 +33,16 @@ else
                     var promos = Store.PromotionsForVenue(venue.Id).Count(p => p.Status == "Running");
                     var campaigns = Store.CampaignsForVenue(venue.Id).Count();
                     <article class="venue-card">
-                        <div class="venue-visual @venue.ImageTone"></div>
+                        <div class="venue-visual @venue.ImageTone">
+                            @if (!string.IsNullOrWhiteSpace(venue.ImageUrl))
+                            {
+                                <img src="@venue.ImageUrl" alt="" class="venue-photo" />
+                            }
+                            <label class="venue-photo-edit btn btn-ghost btn-sm">
+                                Change photo
+                                <InputFile OnChange="e => OnPhotoSelectedAsync(venue.Id, e)" accept="image/*" />
+                            </label>
+                        </div>
                         <div class="venue-body">
                             <div class="card-top">
                                 <div>
@@ -70,7 +80,7 @@ else
                                 {
                                     <button type="button" class="btn btn-secondary btn-sm" @onclick='() => SetStatusAsync(venue.Id, "Active")'>Activate</button>
                                 }
-                                <button type="button" class="btn btn-danger btn-sm" @onclick="() => RemoveAsync(venue.Id)">Remove</button>
+                                <button type="button" class="btn btn-danger btn-sm" @onclick="() => AskRemove(venue)">Remove</button>
                             </div>
                         </div>
                     </article>
@@ -80,13 +90,22 @@ else
     </div>
 }
 
+<ConfirmDialog Open="_confirmOpen"
+               Title="Remove this venue?"
+               Message="@_confirmMessage"
+               ConfirmLabel="Remove venue"
+               OnConfirm="ConfirmRemoveAsync"
+               OnCancel="CancelRemove" />
+
 @code {
     private bool _ready;
+    private bool _confirmOpen;
+    private string _confirmMessage = "";
+    private string? _pendingRemoveId;
 
     protected override async Task OnInitializedAsync()
     {
         Store.Changed += OnChanged;
-
         await Store.EnsureLoadedAsync();
         _ready = true;
     }
@@ -95,7 +114,62 @@ else
 
     private Task SetStatusAsync(string id, string status) => Store.SetVenueStatusAsync(id, status);
 
-    private Task RemoveAsync(string id) => Store.RemoveVenueAsync(id);
+    private void AskRemove(Venue venue)
+    {
+        _pendingRemoveId = venue.Id;
+        _confirmMessage = $"Remove “{venue.Name}”? Its promotions and campaigns will be removed too. This cannot be undone.";
+        _confirmOpen = true;
+    }
+
+    private void CancelRemove()
+    {
+        _confirmOpen = false;
+        _pendingRemoveId = null;
+    }
+
+    private async Task ConfirmRemoveAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(_pendingRemoveId))
+        {
+            await Store.RemoveVenueAsync(_pendingRemoveId);
+        }
+
+        _confirmOpen = false;
+        _pendingRemoveId = null;
+    }
+
+    private async Task OnPhotoSelectedAsync(string venueId, InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file is null)
+        {
+            return;
+        }
+
+        await using var stream = file.OpenReadStream(maxAllowedSize: 8 * 1024 * 1024);
+        using var streamRef = new DotNetStreamReference(stream);
+        string dataUrl;
+        try
+        {
+            dataUrl = await Js.InvokeAsync<string>(
+                "crewhopImage.fromStream",
+                streamRef,
+                string.IsNullOrWhiteSpace(file.ContentType) ? "image/jpeg" : file.ContentType);
+        }
+        catch
+        {
+            await using var fallback = file.OpenReadStream(maxAllowedSize: 8 * 1024 * 1024);
+            using var ms = new MemoryStream();
+            await fallback.CopyToAsync(ms);
+            var mime = string.IsNullOrWhiteSpace(file.ContentType) ? "image/png" : file.ContentType;
+            dataUrl = $"data:{mime};base64,{Convert.ToBase64String(ms.ToArray())}";
+        }
+
+        if (!string.IsNullOrWhiteSpace(dataUrl))
+        {
+            await Store.UpdateVenueImageAsync(venueId, dataUrl);
+        }
+    }
 
     public void Dispose() => Store.Changed -= OnChanged;
 }

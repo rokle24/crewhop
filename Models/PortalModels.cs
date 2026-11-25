@@ -27,6 +27,8 @@ public sealed class Venue
     public int WeeklyVisitors { get; set; }
     public double Rating { get; set; }
     public string ImageTone { get; set; } = "forest";
+    /// <summary>Relative path or data URL for the venue cover image.</summary>
+    public string ImageUrl { get; set; } = "";
 }
 
 public sealed class Promotion

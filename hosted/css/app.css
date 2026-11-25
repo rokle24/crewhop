@@ -160,14 +160,14 @@ p {
 }
 
 .brand-lockup .logo {
-  height: 44px;
+  height: 64px;
   width: auto;
   max-width: 100%;
   display: block;
 }
 
 .brand-lockup .logo-sm {
-  height: 36px;
+  height: 48px;
 }
 
 .brand-tag {
@@ -189,30 +189,24 @@ p {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 84%;
-  max-width: 546px;
+  width: 88%;
+  max-width: 560px;
   background: rgba(246, 244, 237, 0.96);
   border-radius: 28px;
-  padding: 1.35rem 1.75rem;
+  padding: 1.1rem 1.25rem;
   box-shadow: 0 10px 28px rgba(41, 53, 45, 0.18);
 }
 
 .login-brand-plate img {
   width: 100%;
   height: auto;
-  max-height: 116px;
+  max-height: 148px;
   object-fit: contain;
   display: block;
 }
 
-.login-card-brand {
-  margin-bottom: 1.25rem;
-}
-
-.login-card-brand img {
-  height: 56px;
-  width: auto;
-  display: block;
+.login-card h2 {
+  margin-top: 0;
 }
 
 .nav-list {
@@ -496,11 +490,32 @@ p {
 }
 
 .venue-visual {
-  height: 96px;
+  height: 160px;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent),
     linear-gradient(160deg, var(--tone-a), var(--tone-b));
   position: relative;
+  overflow: hidden;
+}
+
+.venue-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.venue-photo-edit {
+  position: absolute;
+  right: 0.65rem;
+  bottom: 0.65rem;
+  background: rgba(246, 244, 237, 0.94) !important;
+  cursor: pointer;
+  margin: 0;
+}
+
+.venue-photo-edit input {
+  display: none;
 }
 
 .venue-visual.forest {
@@ -916,4 +931,34 @@ p {
   .metric-row {
     grid-template-columns: 1fr;
   }
+}
+
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(22, 32, 26, 0.45);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  z-index: 80;
+}
+
+.confirm-dialog {
+  width: min(420px, 100%);
+  background: #fffef9;
+  border: 1px solid var(--ch-border);
+  border-radius: 18px;
+  padding: 1.25rem 1.3rem 1.15rem;
+  box-shadow: 0 22px 48px rgba(22, 32, 26, 0.22);
+}
+
+.confirm-dialog h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
 }

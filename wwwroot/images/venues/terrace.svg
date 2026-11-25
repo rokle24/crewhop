@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" role="img" aria-label="Outdoor terrace">
+  <defs>
+    <linearGradient id="day" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9ad0ea"/>
+      <stop offset="55%" stop-color="#d7ebe3"/>
+      <stop offset="100%" stop-color="#c9d9b8"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="420" fill="url(#day)"/>
+  <circle cx="650" cy="80" r="42" fill="#ffe08a"/>
+  <rect y="300" width="800" height="120" fill="#8f9f7a"/>
+  <rect x="80" y="210" width="160" height="90" rx="12" fill="#f6f4ed"/>
+  <rect x="300" y="210" width="160" height="90" rx="12" fill="#f6f4ed"/>
+  <rect x="520" y="210" width="160" height="90" rx="12" fill="#f6f4ed"/>
+  <rect x="110" y="185" width="100" height="12" rx="6" fill="#526B58"/>
+  <rect x="330" y="185" width="100" height="12" rx="6" fill="#526B58"/>
+  <rect x="550" y="185" width="100" height="12" rx="6" fill="#526B58"/>
+  <circle cx="160" cy="250" r="18" fill="#e9c46a"/>
+  <circle cx="380" cy="250" r="18" fill="#e76f51"/>
+  <circle cx="600" cy="250" r="18" fill="#2a9d8f"/>
+  <rect x="40" y="320" width="720" height="18" rx="8" fill="#6d7a5d"/>
+</svg>
