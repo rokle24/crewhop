@@ -153,11 +153,12 @@ else
                         @{
                             var canRemove = Store.CanRemovePromotion(promo);
                         }
-                        <button type="button"
-                                class="btn btn-danger btn-sm"
-                                title="@(canRemove ? "Remove promotion" : "Only promotions with no views or redemptions can be removed")"
-                                disabled="@(!canRemove)"
-                                @onclick="() => AskRemove(promo)">Remove</button>
+                        @if (canRemove)
+                        {
+                            <button type="button"
+                                    class="btn btn-danger btn-sm"
+                                    @onclick="() => AskRemove(promo)">Remove</button>
+                        }
                     </div>
                 </article>
             }

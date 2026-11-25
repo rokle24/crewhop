@@ -195,11 +195,12 @@ else
                         @{
                             var canRemove = Store.CanRemoveCampaign(campaign);
                         }
-                        <button type="button"
-                                class="btn btn-danger btn-sm"
-                                title="@(canRemove ? "Remove campaign" : "Only campaigns with no impressions, clicks, or bookings can be removed")"
-                                disabled="@(!canRemove)"
-                                @onclick="() => AskRemove(campaign)">Remove</button>
+                        @if (canRemove)
+                        {
+                            <button type="button"
+                                    class="btn btn-danger btn-sm"
+                                    @onclick="() => AskRemove(campaign)">Remove</button>
+                        }
                     </div>
                 </article>
             }
